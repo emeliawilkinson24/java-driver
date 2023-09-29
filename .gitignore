@@ -11,6 +11,5 @@
 .flattened-pom.xml
 
 .documenter_local_last_run
-/docs
 target/
 dependency-reduced-pom.xml
