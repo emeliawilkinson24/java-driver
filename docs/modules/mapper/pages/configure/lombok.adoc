@@ -1,15 +1,15 @@
-== Lombok
+= Lombok
 
 https://projectlombok.org/[Lombok] is a popular library that automates repetitive code, such as getters and setters.
 You can use it in conjunction with the mapper to eliminate even more boilerplate.
 
 We have a full example at https://github.com/DataStax-Examples/object-mapper-jvm/tree/master/lombok[DataStax-Examples/object-mapper-jvm/lombok].
 
-=== Writing the model
+== Writing the model
 
 You can either map mutable "data" classes:
 
-[,java]
+[source,java]
 ----
 import lombok.Data;
 import com.datastax.oss.driver.api.mapper.annotations.*;
@@ -24,7 +24,7 @@ public class Product {
 
 Or immutable "value" classes:
 
-[,java]
+[source,java]
 ----
 import lombok.Value;
 import com.datastax.oss.driver.api.mapper.annotations.*;
@@ -40,7 +40,7 @@ public class Product {
 
 You can also use Lombok's fluent accessors if you configure the mapper accordingly:
 
-[,java]
+[source,java]
 ----
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -57,16 +57,16 @@ public static class Product {
 }
 ----
 
-=== Building
+== Building
 
 You'll need to configure the Lombok annotation processor in your build.
 The only requirement is that it must run _before_ the mapper's.
 
-==== Maven
+=== Maven
 
 See the compiler plugin's configuration in the example's https://github.com/DataStax-Examples/object-mapper-jvm/blob/master/lombok/pom.xml[pom.xml].
 
-==== Gradle
+=== Gradle
 
 A similar result can be achieved with:
 

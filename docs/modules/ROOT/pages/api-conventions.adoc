@@ -1,4 +1,4 @@
-== API conventions
+= API conventions
 
 In previous versions, the driver relied solely on Java visibility rules: everything was either private or part of the public API.
 This made it hard to cleanly organize the code, and things ended up all together in one monolithic package;
@@ -17,7 +17,7 @@ You should probably have some familiarity with the source code.
 The public API never exposes internal types (this is enforced automatically by our build).
 You'll generally have to go through an explicit cast:
 
-[,java]
+[source,java]
 ----
 import com.datastax.oss.driver.api.core.context.DriverContext;
 

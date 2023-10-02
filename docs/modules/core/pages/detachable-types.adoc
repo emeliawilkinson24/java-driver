@@ -1,6 +1,6 @@
-== Detachable types
+= Detachable types
 
-=== Quick overview
+== Quick overview
 
 Advanced topic, only needed if you use Java serialization with driver rows or data types, or create tuple or UDT types manually.
 
@@ -18,12 +18,12 @@ Detachable types are an advanced topic, that should only be a concern for 3rd-pa
 If you're simply executing requests and reading results, you probably won't need to worry about them.
 See the <<bottom-line,bottom line>> at the end of this page for details.
 
-=== Rationale
+== Rationale
 
 Detachable components are those that encode or decode their fields themselves.
 For example, when you set a field on a link:../tuples[tuple value]:
 
-[,java]
+[source,java]
 ----
 tupleValue = tupleValue.setString(0, "foo");
 ----
@@ -38,14 +38,14 @@ Encoding requires session-specific information:
 
 Therefore the tuple value needs a reference to the session to access those two objects.
 
-=== Detached objects
+== Detached objects
 
 Detachable types implement the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/detach/Detachable.html[Detachable] interface, which has an `isDetached()` method to check the current status.
 Whenever you get an object from the driver, it is attached:
 
 * reading a row from a result set:
 +
-[,java]
+[source,java]
 ----
   ResultSet rs = session.execute("SELECT * FROM foo");
   Row row = rs.one();
@@ -54,7 +54,7 @@ Whenever you get an object from the driver, it is attached:
 
 * reading a data type from schema metadata:
 +
-[,java]
+[source,java]
 ----
   UserDefinedType udt = session.getMetadata().getKeyspace("ks").getUserDefinedType("type1");
   assert !udt.isDetached();
@@ -67,7 +67,7 @@ This can only happen when:
 * attaching an object to another session;
 * creating a link:../tuples/[tuple] or link:../udts/[UDT] definition manually:
 +
-[,java]
+[source,java]
 ----
   TupleType tupleType = DataTypes.tupleOf(DataTypes.INT, DataTypes.TEXT, DataTypes.FLOAT);
   assert tupleType.isDetached();
@@ -76,11 +76,11 @@ This can only happen when:
 When an object is detached, it uses a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/registry/CodecRegistry.html#DEFAULT[default codec registry] that only handles built-in types, and the latest non-beta protocol version supported by the driver.
 This might be good enough for you if you don't use any custom codec (the binary format has been stable across modern protocol versions).
 
-=== Reattaching
+== Reattaching
 
 Use `attach()` to reattach an object to the session:
 
-[,java]
+[source,java]
 ----
 TupleType tupleType = DataTypes.tupleOf(DataTypes.INT, DataTypes.TEXT, DataTypes.FLOAT);
 assert tupleType.isDetached();
@@ -94,7 +94,7 @@ TupleValue tupleValue = tupleType.newValue().setString(0, "foo");
 
 When you pass a detached type to the session (for example by executing a request with a tuple value based on a detached tuple type), it will automatically be reattached.
 
-=== Sharing data across sessions
+== Sharing data across sessions
 
 If you're reading data from one session and writing it into another, you should take a few extra precautions:
 
@@ -102,7 +102,7 @@ If you're reading data from one session and writing it into another, you should 
 * if the protocol version is different, you should avoid sharing UDT and tuple types;
 keep a separate set of definitions for each session, and copy the values field by field:
 +
-[,java]
+[source,java]
 ----
   Row row = session1.execute("SELECT QUERY...").one();
   UdtValue user1 = row.getUdtValue("user");
@@ -119,7 +119,7 @@ keep a separate set of definitions for each session, and copy the values field b
 +
 This will ensure that UDT definition are not accidentally reattached to the wrong session, and   use the correct protocol version to encode values.
 
-=== Bottom line
+== Bottom line
 
 You only need to worry about detachable types if you serialize driver rows or data types, or if you create tuple or UDT types manually.
 

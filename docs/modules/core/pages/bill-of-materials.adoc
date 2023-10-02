@@ -1,4 +1,4 @@
-== Bill of Materials (BOM)
+= Bill of Materials (BOM)
 
 A "Bill Of Materials" is a special Maven descriptor that defines the versions of a set of related artifacts.
 
@@ -39,7 +39,7 @@ The advantage is that this also applies to transitive dependencies.
 For example, if there is a third-party library X that depends on `java-driver-core`, and you add a dependency to X in this project, `java-driver-core` will be set to the BOM version, regardless of which version X declares in its POM.
 The driver artifacts are always in sync, however they were pulled into the project.
 
-=== BOM and mapper processor
+== BOM and mapper processor
 
 If you are using the driver's link:../../mapper[object mapper], our recommendation is to declare the mapper processor in the link:../../mapper/config/#maven[annotationProcessorPaths] section of the compiler plugin configuration.
 Unfortunately, `<dependencyManagement>` versions don't work there, this is a known Maven issue (https://issues.apache.org/jira/browse/MCOMPILER-391[MCOMPILER-391]).

@@ -1,4 +1,4 @@
-== Common infrastructure
+= Common infrastructure
 
 This covers utilities or concept that are shared throughout the codebase:
 

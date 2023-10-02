@@ -1,13 +1,13 @@
-== Materialized View
+= Materialized View
 
 Materialized Views are an experimental feature introduced in Apache Cassandra 3.0 that provide a mechanism for server-side denormalization from a base table into a view that is updated when the base table is updated.
 https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/querybuilder/SchemaBuilder.html[SchemaBuilder] offers API methods for creating, altering and dropping materialized views.
 
-=== Creating a Materialized View (CREATE MATERIALIZED VIEW)
+== Creating a Materialized View (CREATE MATERIALIZED VIEW)
 
 To start a `CREATE MATERIALIZED VIEW` query, use `createMaterializedView` in https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/querybuilder/SchemaBuilder.html[SchemaBuilder]:
 
-[,java]
+[source,java]
 ----
 import static com.datastax.oss.driver.api.querybuilder.SchemaBuilder.*;
 
@@ -16,7 +16,7 @@ CreateMaterializedViewStart create = createMaterializedView("cycling", "cyclist_
 
 Like all other `CREATE` queries, one may supply `ifNotExists()` to require that the view should only be created if it doesn't already exist, i.e.:
 
-[,java]
+[source,java]
 ----
 CreateMaterializedViewStart create = createMaterializedView("cycling", "cyclist_by_age").ifNotExists();
 ----
@@ -30,7 +30,7 @@ There are a number of steps that must be executed to complete a materialized vie
 
 For example, the following defines a complete `CREATE MATERIALIZED VIEW` statement:
 
-[,java]
+[source,java]
 ----
 createMaterializedView("cycling", "cyclist_by_age")
     .asSelectFrom("cycling", "cyclist")
@@ -50,11 +50,11 @@ Please note that not all WHERE clause relations may be compatible with materiali
 Like a link:../table[table], one may additionally provide configuration such as clustering order, compaction options and so on.
 Refer to https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/querybuilder/schema/RelationStructure.html[RelationStructure] for documentation on additional configuration that may be provided for a view.
 
-=== Altering a Materialized View (ALTER MATERIALIZED VIEW)
+== Altering a Materialized View (ALTER MATERIALIZED VIEW)
 
 To start a `ALTER MATERIALIZED VIEW` query, use `alterMaterializedView`:
 
-[,java]
+[source,java]
 ----
 alterMaterializedView("cycling", "cyclist_by_age");
 ----
@@ -63,7 +63,7 @@ Unlike a table, you may not alter, drop or rename columns on a materialized view
 Instead, one may only alter the options defined in https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/querybuilder/schema/RelationStructure.html[RelationStructure].
 For example:
 
-[,java]
+[source,java]
 ----
 alterMaterializedView("cycling", "cyclist_by_age")
     .withGcGraceSeconds(0)
@@ -71,11 +71,11 @@ alterMaterializedView("cycling", "cyclist_by_age")
 // ALTER MATERIALIZED VIEW cycling.cyclist_by_age WITH gc_grace_seconds=0 AND caching={'keys':'ALL','rows_per_partition':'NONE'}
 ----
 
-=== Dropping a View (DROP MATERIALIZED VIEW)
+== Dropping a View (DROP MATERIALIZED VIEW)
 
 To create a `DROP MATERIALIZED VIEW` query, use `dropMaterializedView`:
 
-[,java]
+[source,java]
 ----
 dropMaterializedView("cycling", "cyclist_by_age");
 // DROP MATERIALIZED VIEW cycling.cyclist_by_age
@@ -83,7 +83,7 @@ dropMaterializedView("cycling", "cyclist_by_age");
 
 You may also specify `ifExists`:
 
-[,java]
+[source,java]
 ----
 dropTable("cyclist_by_age").ifExists();
 // DROP MATERIALIZED VIEW IF EXISTS cyclist_by_age

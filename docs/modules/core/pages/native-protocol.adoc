@@ -1,6 +1,6 @@
-== Native protocol
+= Native protocol
 
-=== Quick overview
+== Quick overview
 
 Low-level binary format.
 Mostly irrelevant for everyday use, only governs whether certain features are available.
@@ -16,7 +16,7 @@ The native protocol defines the format of the binary messages exchanged between 
 As a driver user, you don't need to know the fine details (although the https://github.com/datastax/native-protocol/tree/1.x/src/main/resources[protocol spec] is available if you're curious);
 the most visible aspect is that some features are only available with specific protocol versions.
 
-=== Compatibility matrix
+== Compatibility matrix
 
 Java driver 4 supports protocol versions 3 to 5.
 By default, the version is negotiated with the first node the driver connects to:
@@ -60,11 +60,11 @@ The table below shows the protocol matrix for these cases:
 
 _(2) DSE Protocols are chosen before other Cassandra native protocols._
 
-=== Controlling the protocol version
+== Controlling the protocol version
 
 To find out which version you're currently using, use the following:
 
-[,java]
+[source,java]
 ----
 ProtocolVersion currentVersion = session.getContext().getProtocolVersion();
 ----
@@ -92,7 +92,7 @@ Exception in thread "main" com.datastax.oss.driver.api.core.AllNodesFailedExcept
                      [/127.0.0.1:9042] Host does not support protocol version V5)
 ----
 
-=== Protocol version with mixed clusters
+== Protocol version with mixed clusters
 
 It's possible to have heterogeneous Cassandra versions in your cluster, in particular during a rolling upgrade.
 This used to be a problem with previous driver versions, which would negotiate a version with the first contacted node that might not work with others.
@@ -108,7 +108,7 @@ If that is lower than the initially negotiated version, the first connection is 
 
 Thanks to this approach, automatic negotiation works even with mixed clusters, you don't need to force the protocol version manually anymore.
 
-=== Debugging protocol negotiation
+== Debugging protocol negotiation
 
 You can observe the negotiation process in the link:../logging/[logs].
 
@@ -127,15 +127,15 @@ INFO DefaultSession - Negotiated protocol version v4 for the initial contact poi
 
 If you want to see the details of mixed cluster negotiation, enable `DEBUG` level for the category `com.datastax.oss.driver.internal.core.CassandraProtocolVersionRegistry`.
 
-=== New features by protocol version
+== New features by protocol version
 
-==== v3 to v4
+=== v3 to v4
 
 * https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/ExecutionInfo.html#getWarnings--[query warnings]
 * link:../statements/prepared/#unset-values[unset values in bound statements]
 * https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/Request.html#getCustomPayload--[custom payloads]
 
-==== v4 to v5
+=== v4 to v5
 
 * link:../statements/per_query_keyspace[per-query keyspace]
 * link:../statements/prepared/#prepared-statements-and-schema-changes[improved prepared statement resilience] in the face of schema changes

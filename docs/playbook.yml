@@ -1,0 +1,11 @@
+content:
+  sources:
+  - url: ./  # relative path to your documentation repo or directory
+    branches: HEAD  # Use HEAD to just build the current branch
+
+site:
+  title: "Java Driver Docs"
+  url: https://example.org/docs  # Your desired documentation site URL
+
+output:
+  dir: ./build/site  # Where you want Antora to output the built site

@@ -1,6 +1,6 @@
-== Non-blocking programming
+= Non-blocking programming
 
-=== Quick overview
+== Quick overview
 
 With the advent of reactive programming, the demand for fully non-blocking libraries has become  popular among application developers.
 The recent availability of frameworks enforcing lock-freedom,  such as https://vertx.io[Vert.x] or https://projectreactor.io[Reactor], along with tools for automatic detection of blocking calls like  https://github.com/reactor/BlockHound[BlockHound], has exacerbated this trend even more so.
@@ -12,7 +12,7 @@ A final chapter explains how to use the  driver with BlockHound.
 
 The developer guide also has more information on driver internals and its  link:../../developer/common/concurrency[concurrency model].
 
-=== Definition of "non-blocking"
+== Definition of "non-blocking"
 
 Since the term "non-blocking" is subject to interpretation, in this page the term should be  understood as "https://www.baeldung.com/lock-free-programming[lock-free]": a program is non-blocking if at least one thread is guaranteed to make  progress;
 such programs are implemented without locks, mutexes nor semaphores, using only low-level  primitives such as atomic variables and CAS (compare-and-swap) instructions.
@@ -20,9 +20,9 @@ such programs are implemented without locks, mutexes nor semaphores, using only 
 A further distinction is generally established between "lock-free" and "wait-free" algorithms: the  former ones allow progress of the overall system, while the latter ones allow each thread to make  progress at any time.
 This distinction is however rather theoretical and is outside the scope of  this document.
 
-=== Driver lock-free guarantees
+== Driver lock-free guarantees
 
-==== Driver lock-free guarantees per execution models
+=== Driver lock-free guarantees per execution models
 
 The driver offers many execution models.
 For the built-in ones, the lock-free guarantees are as  follows:
@@ -45,7 +45,7 @@ Although such locks are only held for  extremely brief periods of time, and neve
 As a consequence, all methods declared in https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/cql/continuous/ContinuousSession.html[`ContinuousSession`] and https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/cql/continuous/reactive/ContinuousReactiveSession.html[`ContinuousReactiveSession`]  cannot be considered as implemented 100% lock-free, even those built on top of the asynchronous or  reactive APIs like https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/cql/continuous/ContinuousSession.html#executeContinuouslyAsync-com.datastax.oss.driver.api.core.cql.Statement-[`executeContinuouslyAsync`] and https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/cql/continuous/reactive/ContinuousReactiveSession.html#executeContinuouslyReactive-com.datastax.oss.driver.api.core.cql.Statement-[`executeContinuouslyReactive`].
 In practice  though, continuous paging is extremely efficient and can safely be used in most non-blocking  contexts, unless they require strict lock-freedom.
 
-==== Driver lock-free guarantees per session lifecycle phases
+=== Driver lock-free guarantees per session lifecycle phases
 
 The guarantees vary according to three possible session states: initializing, running, and closing.
 
@@ -70,7 +70,7 @@ Once the session is initialized, however, the driver is guaranteed to be non-blo
 Finally, closing the session is generally non-blocking, but the driver offers no strong guarantees  during that phase.
 Therefore, calls to any method declared in https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/AsyncAutoCloseable.html[`AsyncAutoCloseable`], including the  asynchronous ones like https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/AsyncAutoCloseable.html#closeAsync--[`closeAsync()`], should also be preferably deferred until the application is  shut down and lock-freedom enforcement is disabled.
 
-==== Driver lock-free guarantees for specific components
+=== Driver lock-free guarantees for specific components
 
 Certain driver components are not implemented in lock-free algorithms.
 
@@ -115,7 +115,7 @@ They are listed below in case their exclusion is necessary:
 * `com.datastax.oss.driver.internal.core.util.concurrent.LazyReference`
 * `com.datastax.oss.driver.internal.core.util.concurrent.ReplayingEventFilter`
 
-==== Driver lock-free guarantees on topology and status events
+=== Driver lock-free guarantees on topology and status events
 
 Topology and status events can cause the driver to use locks temporarily.
 
@@ -131,7 +131,7 @@ if you need to enforce strict lock-freedom, and topology or status changes are b
 * `com.datastax.oss.driver.internal.core.pool.ChannelSet#remote(DriverChannel)`
 * `com.datastax.oss.driver.internal.core.metadata.LoadBalancingPolicyWrapper$SinglePolicyDistanceReporter#setDistance(Node,NodeDistance)`
 
-==== Driver lock-free guarantees on random uuid generation
+=== Driver lock-free guarantees on random uuid generation
 
 Until driver 4.9, the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/uuid/Uuids.html#random--[`Uuids.random()`] method was a blocking call.
 Because of that, this method  could not be used in non-blocking contexts, making UUID generation a difficult issue to solve.
@@ -140,7 +140,7 @@ Moreover, this method is used in a few places internally.
 This situation was unfortunate because lock-freedom enforcement tools could report calls to that method, but it was impossible to suppress these calls.
 Thanks to https://datastax-oss.atlassian.net/browse/JAVA-2449[JAVA-2449], released with driver 4.10.0, `Uuids.random()` became a non-blocking call and random UUIDs can now be safely generated in non-blocking applications.
 
-==== Driver lock-free guarantees when reloading the configuration
+=== Driver lock-free guarantees when reloading the configuration
 
 The driver has a pluggable configuration mechanism built around the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/config/DriverConfigLoader.html[`DriverConfigLoader`]  interface.
 Implementors may choose to support https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/config/DriverConfigLoader.html#supportsReloading--[hot-reloading] of configuration files, and the  default built-in implementation has this feature enabled by default.
@@ -150,14 +150,14 @@ If hot-reloading is enabled, then this might be reported by lock-freedom infring
 If that is the case, it is advised to disable hot-reloading by setting the  `datastax-java-driver.basic.config-reload-interval` option to 0.
 See the manual page on  link:../configuration[configuration] for more information.
 
-==== Driver lock-free guarantees when connecting to DSE
+=== Driver lock-free guarantees when connecting to DSE
 
 When connecting to clusters running recent DSE versions, the driver automatically enables periodic  status reporting.
 When preparing the status report, the driver has to hit the local filesystem, and because of that, the status reporting process does not qualify as lock-free.
 
 If lock-freedom is being enforced, then automatic status reporting must be disabled by setting the `datastax-java-driver.advanced.monitor-reporting.enabled` property to false in the driver  configuration.
 
-=== Driver mechanism for detection of blocking calls
+== Driver mechanism for detection of blocking calls
 
 The driver has its own mechanism for detecting blocking calls happening on an internal driver  thread.
 This mechanism is capable of detecting and reporting blatant cases of misuse of the  asynchronous and reactive APIs, e.g.
@@ -168,7 +168,7 @@ The driver is not capable, however, of detecting low-level lock-freedom infringe
 You must use an external tool to achieve that.
 See below how to use BlockHound for  that.
 
-=== Using the driver with Reactor BlockHound
+== Using the driver with Reactor BlockHound
 
 https://projectreactor.io[Reactor]'s tool for automatic detection of blocking calls, https://github.com/reactor/BlockHound[BlockHound], is capable of detecting  and reporting any sort of blocking calls, including I/O, locks, `Thread.sleep`, etc.
 

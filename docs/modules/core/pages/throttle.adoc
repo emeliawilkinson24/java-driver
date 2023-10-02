@@ -1,6 +1,6 @@
-== Request throttling
+= Request throttling
 
-=== Quick overview
+== Quick overview
 
 Limit session throughput.
 
@@ -31,12 +31,12 @@ Note that the following requests are also affected by throttling:
 * fetching the next page of a result set (which happens in the background when you iterate the synchronous variant `ResultSet`).
 * fetching a link:../tracing/[query trace].
 
-=== Configuration
+== Configuration
 
 Request throttling is parameterized in the link:../configuration/[configuration] under `advanced.throttler`.
 There are various implementations, detailed in the following sections:
 
-==== Pass through
+=== Pass through
 
 ----
 datastax-java-driver {
@@ -52,7 +52,7 @@ Note that you will still hit a limit if all your connections run out of stream i
 In that case, requests will fail with an https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/AllNodesFailedException.html[AllNodesFailedException], with the `getErrors()` method returning a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/connection/BusyConnectionException.html[BusyConnectionException] for each node.
 See the link:../pooling/[connection pooling] page.
 
-==== Concurrency-based
+=== Concurrency-based
 
 ----
 datastax-java-driver {
@@ -77,7 +77,7 @@ Keep in mind that aggressive speculative executions and timeout options can infl
 One good way to get this right is to track the `pool.available-streams` link:../metrics[metric] on every node, and make sure it never reaches 0.
 See the link:../pooling/[connection pooling] page.
 
-==== Rate-based
+=== Rate-based
 
 ----
 datastax-java-driver {
@@ -102,7 +102,7 @@ start with a few milliseconds and use the `cql-requests` link:../metrics/[metric
 Like with the concurrency-based throttler, you should make sure that your target rate is in line with the pooling options;
 see the recommendations in the previous section.
 
-=== Monitoring
+== Monitoring
 
 Enable the following link:../metrics/[metrics] to monitor how the throttler is performing:
 

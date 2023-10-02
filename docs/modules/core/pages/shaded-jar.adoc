@@ -1,4 +1,4 @@
-== Using the shaded JAR
+= Using the shaded JAR
 
 The default `java-driver-core` JAR depends on a number of link:../integration/#driver-dependencies[third party libraries].
 This can create conflicts if your application already uses other versions of those same dependencies.

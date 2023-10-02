@@ -1,19 +1,19 @@
-== Performance
+= Performance
 
 This page is intended as a checklist for everything related to driver performance.
 Most of the information is already available in other sections of the manual, but it's linked here for easy reference if you're benchmarking your application or diagnosing performance issues.
 
-=== Statements
+== Statements
 
 link:../statements/[Statements] are some of the driver types you'll use the most.
 Every request needs one -- even `session.execute(String)` creates a `SimpleStatement` under the hood.
 
-==== Immutability and builders
+=== Immutability and builders
 
 Statements are by default implemented with immutable classes: every call to a setter method creates an intermediary copy.
 If you have multiple attributes to set, use a builder instead:
 
-[,java]
+[source,java]
 ----
 SimpleStatement statement = SimpleStatement.builder("SELECT * FROM foo")
     .setPageSize(20)
@@ -24,7 +24,7 @@ SimpleStatement statement = SimpleStatement.builder("SELECT * FROM foo")
 
 Also, note that you don't need a driver `Session` to create simple statements: they can be initialized statically and stored as constants.
 
-==== Prepared statements
+=== Prepared statements
 
 link:../statements/prepared[Prepared statements] allow Cassandra to cache parsed query strings server-side, but that's not their only benefit for performance:
 
@@ -39,7 +39,7 @@ The driver caches prepared statements -- see https://docs.datastax.com/en/driver
 However, if the query is static, it's still a good practice to cache your `PreparedStatement` instances to avoid calling `prepare()` every time.
 One common pattern is to use some sort of DAO component:
 
-[,java]
+[source,java]
 ----
 public static class UserDao {
 
@@ -58,9 +58,9 @@ public static class UserDao {
 }
 ----
 
-=== Request execution
+== Request execution
 
-==== Connection pooling
+=== Connection pooling
 
 By default, the driver opens 1 connection per node, and allows 1024 concurrent requests on each connection.
 In our experience this is enough for most scenarios.
@@ -68,19 +68,19 @@ In our experience this is enough for most scenarios.
 If your application generates a very high throughput (hundreds of thousands of requests per second),  you might want to experiment with different settings.
 See the link:../pooling/#tuning[tuning] section in the connection pooling page.
 
-==== Compression
+=== Compression
 
 Consider link:../compression/[compression] if your queries return large payloads;
 it might help to reduce network traffic.
 
-==== Timestamp generation
+=== Timestamp generation
 
 Each query is assigned a link:../query_timestamps/[timestamp] to order them relative to each other.
 
 By default, this is done driver-side with link:../query_timestamps/#atomic-timestamp-generator[AtomicTimestampGenerator].
 This is a very simple operation so unlikely to be a bottleneck, but note that there are other options, such as a link:../query_timestamps/#thread-local-timestamp-generator[thread-local] variant that creates slightly less contention, writing your own implementation or letting the server assign timestamps.
 
-==== Tracing
+=== Tracing
 
 link:../tracing/[Tracing] should be used for only a small percentage of your queries.
 It consumes additional resources on the server, and fetching each trace requires background requests.
@@ -88,38 +88,38 @@ It consumes additional resources on the server, and fetching each trace requires
 Do not enable tracing for every request;
 it's a sure way to bring your performance down.
 
-==== Request trackers
+=== Request trackers
 
 link:../request_tracker/[Request trackers] are on the hot path (that is, invoked on I/O threads, each time a request is executed), and users can plug custom implementations.
 
 If you experience throughput issues, check if any trackers are configured, and what they are doing.
 They should avoid blocking calls, as well as any CPU-intensive computations.
 
-==== Metrics
+=== Metrics
 
 Similarly, some of the driver's link:../metrics/[metrics] are updated for every request (if the metric is enabled).
 
 By default, the driver ships with all metrics disabled.
 Enable them conservatively, and if you're investigating a performance issue, try disabling them temporarily to check that they are not the cause.
 
-==== Throttling
+=== Throttling
 
 link:../throttling/[Throttling] can help establish more predictable server performance, by controlling how much load each driver instance is allowed to put on the cluster.
 The throttling algorithm itself incurs a bit of overhead in the driver, but that shouldn't be a problem since the goal is to stay under reasonable rates in the first place.
 
 If you're debugging an unfamiliar application and experience a throughput plateau, make sure that it's not caused by a throttler.
 
-=== Caching reusable objects
+== Caching reusable objects
 
 Many driver objects are immutable.
 If you reuse the same values often, consider caching them in private fields or constants to alleviate GC pressure.
 
-==== Identifiers
+=== Identifiers
 
 The driver uses https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/CqlIdentifier.html[CqlIdentifier] to deal with link:../../case_sensitivity[case sensitivity].
 When you call methods that take raw strings, the driver generally wraps them under the hood:
 
-[,java]
+[source,java]
 ----
 session.getMetadata().getKeyspace("inventory"); // shortcut for getKeyspace(CqlIdentifier.fromCql("inventory")
 
@@ -133,7 +133,7 @@ This also applies to built queries, although it's less important because general
 
 Note however that row getters and bound statement setters do *not* wrap their argument: because those methods are used very often, they handle raw strings with an optimized algorithm that does not require creating an identifier (the rules are detailed https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/data/AccessibleByName.html[here]).
 
-[,java]
+[source,java]
 ----
 // No need to extract a CqlIdentifier, raw strings are handled efficiently:
 Row row = session.execute("SELECT * FROM user WHERE id = 1").one();
@@ -143,12 +143,12 @@ PreparedStatement pst = session.prepare("UPDATE user SET name=:name WHERE id=:id
 pst.bind().setInt("age", 25);
 ----
 
-==== Type tokens
+=== Type tokens
 
 https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/reflect/GenericType.html[GenericType] is used to express complex generic types -- such as link:../#collection-types[nested collections] -- in getters and setters.
 These objects are immutable and stateless, so they are good candidates for constants:
 
-[,java]
+[source,java]
 ----
 public static final GenericType<Set<List<String>>> SET_OF_LIST_OF_STRING = new GenericType<Set<List<String>>>() {};
 
@@ -158,12 +158,12 @@ Set<List<String>> teams = row.get("teams", SET_OF_LIST_OF_STRING);
 `GenericType` itself already exposes a few of those constants.
 You can create your own utility class to store yours.
 
-==== Built queries
+=== Built queries
 
 Similarly, link:../../query_builder/[built queries] are immutable and don't need a reference to a live driver instance.
 If you create them statically, they can be stored as constants:
 
-[,java]
+[source,java]
 ----
 public static final BuildableQuery SELECT_SERVER_VERSION =
     selectFrom("system", "local").column("release_version");
@@ -171,11 +171,11 @@ public static final BuildableQuery SELECT_SERVER_VERSION =
 
 Note that you don't necessarily need to extract `CqlIdentifier` constants since the construction already happens at initialization time.
 
-==== Derived configuration profiles
+=== Derived configuration profiles
 
 The configuration API allows you to build link:../configuration/#derived-profiles[derived profiles] at runtime.
 
-[,java]
+[source,java]
 ----
 DriverExecutionProfile dynamicProfile =
   defaultProfile.withString(
@@ -184,12 +184,12 @@ DriverExecutionProfile dynamicProfile =
 
 Their use is generally discouraged (you should define profiles statically in the configuration file as much as possible), but if there's no other way and you reuse them over time, store them instead of recreating them each time.
 
-=== Metadata
+== Metadata
 
 The driver maintains link:../metadata/[metadata] about the state of the Cassandra cluster.
 This work is done on dedicated "admin" threads (see the <<thread-pooling,thread pooling>> section below), so it's not in direct competition with regular requests.
 
-==== Filtering
+=== Filtering
 
 You can disable entire parts of the metadata with those configuration options:
 
@@ -235,7 +235,8 @@ To get a sense of the time spent on metadata refreshes, enable link:../logging/[
 [s0-admin-0] DEBUG c.d.o.d.i.c.metadata.MetadataManager - [s0] Applying schema refresh took 34 ms
 ----
 
-==== Debouncing
+[[debouncing]]
+=== Debouncing
 
 The driver receives push notifications of schema and topology changes from the Cassandra cluster.
 These signals are _debounced_, meaning that rapid series of events will be amortized, for example:
@@ -265,7 +266,8 @@ datastax-java-driver.advanced.metadata {
 
 You may adjust those settings depending on your application's needs: higher values mean less impact on performance, but the driver will be slower to react to changes.
 
-==== Schema updates
+[[schema-updates]]
+=== Schema updates
 
 You should group your schema changes as much as possible.
 
@@ -281,7 +283,7 @@ Run them from the same application thread, and, if you use the asynchronous API,
 * send all the changes to the same coordinator.
 This is one of the rare cases where we recommend using https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/Statement.html#setNode-com.datastax.oss.driver.api.core.metadata.Node-[Statement.setNode()].
 
-=== Thread pooling
+== Thread pooling
 
 The driver architecture is designed around two code paths:
 

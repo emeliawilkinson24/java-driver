@@ -1,8 +1,8 @@
-== GetEntity methods
+= GetEntity methods
 
 Annotate a DAO method with https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/mapper/annotations/GetEntity.html[@GetEntity] to convert a core driver data structure into one or more link:../../entities[Entities]:
 
-[,java]
+[source,java]
 ----
 @Dao
 public interface ProductDao {
@@ -13,7 +13,7 @@ public interface ProductDao {
 
 The generated code will retrieve each entity property from the source, such as:
 
-[,java]
+[source,java]
 ----
 Product product = new Product();
 product.setId(row.get("id", UUID.class));
@@ -24,7 +24,7 @@ product.setDescription(row.get("description", String.class));
 It does not perform a query.
 Instead, those methods are intended for cases where you already have a query result, and just need the conversion logic.
 
-=== Lenient mode
+== Lenient mode
 
 By default, the mapper operates in "strict" mode: the source row must contain a matching column for every property in the entity definition, _including computed ones_.
 If such a column is not found, an error will be thrown.
@@ -35,7 +35,7 @@ However, _unmatched properties will be left untouched_.
 
 As an example to illustrate how lenient mode works, assume that we have the following entity and DAO:
 
-[,java]
+[source,java]
 ----
 @Entity class Product {
 
@@ -55,12 +55,12 @@ interface ProductDao {
 
 Then the following code would be possible:
 
-[,java]
+[source,java]
 ----
 // row does not contain the price column
 Row row = session.execute("SELECT id, description FROM product").one();
 Product product = productDao.getLenient(row);
-assert product.price == 0.0;
+assert product.price = 0.0;
 ----
 
 Since no `price` column was found in the source row, `product.price` wasn't set and was left to its default value (0.0).
@@ -70,7 +70,7 @@ Lenient mode allows to achieve the equivalent of driver 3.x https://docs.datasta
 
 *Beware that lenient mode may result in incomplete entities being produced.*
 
-=== Parameters
+== Parameters
 
 The method must have a single parameter.
 The following types are allowed:
@@ -81,7 +81,7 @@ The following types are allowed:
 
 The data must match the target entity: the generated code will try to extract every mapped property, and fail if one is missing.
 
-=== Return type
+== Return type
 
 The method can return:
 
@@ -101,7 +101,7 @@ If the argument is a result set type, the generated code will extract the first 
 In that case, the type of the parameter *must* be https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/ResultSet.html[ResultSet].
 Each row in the result set will be converted into an entity instance.
 +
-[,java]
+[source,java]
 ----
   @GetEntity
   PagingIterable<Product> asProducts(ResultSet resultSet);
@@ -115,7 +115,7 @@ NOTE: even if streams are lazily evaluated, results are fetched synchronously;
 therefore, as the   returned stream is traversed, blocking calls may occur, as more results are fetched from the   server in the background.
 For details about the stream's characteristics, see   https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/PagingIterable.html#spliterator--[PagingIterable.spliterator].
 +
-[,java]
+[source,java]
 ----
   @GetEntity
   Stream<Product> asProducts(ResultSet resultSet);
@@ -125,7 +125,7 @@ For details about the stream's characteristics, see   https://docs.datastax.com/
 In that case, the type of the parameter *must* be https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/AsyncResultSet.html[AsyncResultSet].
 Each row in the result set will be converted into an entity instance.
 +
-[,java]
+[source,java]
 ----
   @GetEntity
   MappedAsyncPagingIterable<Product> asProducts(AsyncResultSet resultSet);

@@ -1,8 +1,8 @@
-== Metadata
+= Metadata
 
-=== Quick overview
+== Quick overview
 
-https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/Session.html#getMetadata--[session.getMetadata()]: node states, schema and token map.
+https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/Session.html#getMetadata--[session.getMetadata()]: node states, schema, and token map.
 
 * immutable, provides a consistent view at a given point in time (e.g.
 token map always matches schema).
@@ -14,15 +14,15 @@ must call `session.getMetadata()` again to observe changes.
 The driver exposes metadata about the Cassandra cluster via the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/Session.html#getMetadata--[Session#getMetadata] method.
 It returns a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/Metadata.html[Metadata] object, which contains three types of information:
 
-* link:node/[node metadata]
-* link:schema/[schema metadata]
-* link:token/[token metadata]
+* xref:core:metadata/node.adoc[node metadata]
+* xref:core:metadata/schema.adoc[schema metadata]
+* xref:core:metadata/token.adoc[token metadata]
 
 Metadata is mostly *immutable* (except for the fields of the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/Node.html[Node] class, see the "node metadata" link above for details).
 Each call to `getMetadata()` will return a *new copy* if something has changed since the last call.
 Do not cache the result across usages:
 
-[,java]
+[source,java]
 ----
 Metadata metadata = session.getMetadata();
 
@@ -33,13 +33,13 @@ TableMetadata fooMetadata =
     metadata
         .getKeyspace(CqlIdentifier.fromCql("test"))
         .getTable(CqlIdentifier.fromCql("foo"));
-assert fooMetadata == null;
+assert fooMetadata = null;
 ----
 
 On the other hand, the advantage of immutability is that a `Metadata` instance provides a *consistent view* of the cluster at a given point in time.
 In other words, the token map is guaranteed to be in sync with the node and schema metadata:
 
-[,java]
+[source,java]
 ----
 Metadata metadata = session.getMetadata();
 // Pick up any node and keyspace:
@@ -55,4 +55,4 @@ This is a big improvement over previous versions of the driver, where it was pos
 
 Schema and node state events are debounced.
 This allows you to control how often the metadata gets refreshed.
-See the link:../performance/#debouncing[Performance] page for more details.
+See the xref:core:performance.adoc#debouncing[Performance] page for more details.

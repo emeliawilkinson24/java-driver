@@ -1,8 +1,8 @@
-== Delete methods
+= Delete methods
 
 Annotate a DAO method with https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/mapper/annotations/Delete.html[@Delete] to generate a query that deletes an link:../../entities[Entity]:
 
-[,java]
+[source,java]
 ----
 @Dao
 public interface ProductDao {
@@ -11,13 +11,13 @@ public interface ProductDao {
 }
 ----
 
-=== Parameters
+== Parameters
 
 The method can operate on:
 
 * an entity instance:
 +
-[,java]
+[source,java]
 ----
   @Delete
   void delete(Product product);
@@ -25,7 +25,7 @@ The method can operate on:
 
 * a primary key (partition key + clustering columns):
 +
-[,java]
+[source,java]
 ----
   @Delete(entityClass = Product.class)
   void deleteById(UUID productId);
@@ -39,7 +39,7 @@ In addition, because the entity class can't be inferred from the method signatur
 * a subset of the primary key.
 As in the partition key, or partition key + subset of clustering  columns:
 +
-[,java]
+[source,java]
 ----
   // given: PRIMARY KEY ((product_id, day), customer_id, ts)
   // delete all rows in partition
@@ -61,7 +61,7 @@ As in the partition key, or partition key + subset of clustering  columns:
 
 * a number of parameters matching the placeholder markers in `customWhereClause`, for which the parameters match the name and compatible java type of the markers:
 +
-[,java]
+[source,java]
 ----
   @Delete(
       entityClass = ProductSale.class,
@@ -73,7 +73,7 @@ As in the partition key, or partition key + subset of clustering  columns:
 An optional IF clause can be added to the generated query.
 Like `customWhereClause` it can contain  placeholders:
 
-[,java]
+[source,java]
 ----
 @Delete(entityClass = Product.class, customIfClause = "description = :expectedDescription")
 void deleteIfDescriptionMatches(UUID productId, String expectedDescription);
@@ -84,7 +84,7 @@ It will be applied to the statement before execution.
 This allows you to customize certain aspects of the request (page size, timeout, etc) at runtime.
 See link:../statement_attributes/[statement attributes].
 
-=== Return type
+== Return type
 
 The method can return:
 
@@ -92,7 +92,7 @@ The method can return:
 * a `boolean` or `Boolean`, which will be mapped to https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/ResultSet.html#wasApplied--[ResultSet#wasApplied()].
 This is intended for IF EXISTS queries:
 +
-[,java]
+[source,java]
 ----
   /** @return true if the product did exist */
   @Delete(ifExists = true)
@@ -103,7 +103,7 @@ This is intended for IF EXISTS queries:
 This is intended for queries with custom IF clauses;
 when those queries are not applied, they return the actual values of the tested columns.
 +
-[,java]
+[source,java]
 ----
   @Delete(entityClass = Product.class, customIfClause = "description = :expectedDescription")
   ResultSet deleteIfDescriptionMatches(UUID productId, String expectedDescription);
@@ -113,7 +113,7 @@ when those queries are not applied, they return the actual values of the tested 
 * a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/BoundStatement.html[BoundStatement].
 This is intended for queries where you will execute this statement later or in a batch.
 +
-[,java]
+[source,java]
 ----
   @Delete
   BoundStatement delete(Product product);
@@ -123,7 +123,7 @@ This is intended for queries where you will execute this statement later or in a
 The method will execute the query asynchronously.
 Note that for result sets, you need to switch to https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/AsyncResultSet.html[AsyncResultSet].
 +
-[,java]
+[source,java]
 ----
   @Delete
   CompletableFuture<Void> deleteAsync(Product product);
@@ -137,7 +137,7 @@ Note that for result sets, you need to switch to https://docs.datastax.com/en/dr
 
 * a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/cql/reactive/ReactiveResultSet.html[ReactiveResultSet].
 +
-[,java]
+[source,java]
 ----
   @Delete
   ReactiveResultSet deleteReactive(Product product);
@@ -147,7 +147,7 @@ Note that for result sets, you need to switch to https://docs.datastax.com/en/dr
 
 Note that you can also return a boolean or result set for non-conditional queries, but there's no practical purpose for that since those queries always return `wasApplied = true` and an empty result set.
 
-=== Target keyspace and table
+== Target keyspace and table
 
 If a keyspace was specified link:../../mapper/#dao-factory-methods[when creating the DAO], then the generated query targets that keyspace.
 Otherwise, it doesn't specify a keyspace, and will only work if the mapper was built from a session that has a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#withKeyspace-com.datastax.oss.driver.api.core.CqlIdentifier-[default keyspace] set.

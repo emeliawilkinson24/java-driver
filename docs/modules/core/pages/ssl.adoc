@@ -1,6 +1,6 @@
-== SSL
+= SSL
 
-=== Quick overview
+== Quick overview
 
 Secure the traffic between the driver and Cassandra.
 
@@ -21,9 +21,9 @@ it assumes that you've already configured SSL in Cassandra:
 * https://docs.datastax.com/en/cassandra/3.0/cassandra/configuration/secureSSLClientToNode.html[the Cassandra documentation] covers a basic approach with self-signed certificates, which is fine for development and tests.
 * http://thelastpickle.com/blog/2015/09/30/hardening-cassandra-step-by-step-part-1-server-to-server.html[this blog post] details a more advanced solution based on a Certificate Authority (CA).
 
-=== Preparing the certificates
+== Preparing the certificates
 
-==== Client truststore
+=== Client truststore
 
 This is required for client-to-node encryption.
 
@@ -47,7 +47,7 @@ If you're using a Certificate Authority, the client truststore only needs to con
 keytool -import -v -trustcacerts -alias CARoot -file ca.cer -keystore client.truststore
 ----
 
-==== Client keystore
+=== Client keystore
 
 If you also intend to use client certificate authentication, generate the public and private key pair for the client:
 
@@ -65,13 +65,13 @@ keytool -import -v -trustcacerts -alias client -file client.cer -keystore server
 If you're using a CA, sign the client certificate with it (see the blog post linked at the top of this page).
 Then the nodes' truststores only need to contain the CA's certificate (which should already be the case if you've followed the steps for inter-node encryption).
 
-=== Driver configuration
+== Driver configuration
 
 By default, the driver's SSL support is based on the JDK's built-in implementation: JSSE (Java Secure Socket Extension),.
 
 To enable it, you need to define an engine factory in the link:../configuration/[configuration].
 
-==== JSSE, property-based
+=== JSSE, property-based
 
 ----
 datastax-java-driver {
@@ -109,13 +109,13 @@ Alternatively to storing keystore and truststore information in your configurati
 -Djavax.net.ssl.keyStorePassword=password123
 ----
 
-==== JSSE, custom factory
+=== JSSE, custom factory
 
 If you need more control than what system properties allow, you need to write your own engine factory.
 If you just need specific configuration on the `SSLEngine`, you can extend the default factory and override `newSslEngine`.
 For example, here is how you would configure custom `AlgorithmConstraints`:
 
-[,java]
+[source,java]
 ----
 public class CustomSslEngineFactory extends DefaultSslEngineFactory {
 
@@ -144,12 +144,12 @@ datastax-java-driver {
 }
 ----
 
-==== JSSE, programmatic
+=== JSSE, programmatic
 
 You can also provide a factory instance programmatically.
 This will take precedence over the configuration:
 
-[,java]
+[source,java]
 ----
 SslEngineFactory yourFactory = ...
 CqlSession session = CqlSession.builder()
@@ -159,7 +159,7 @@ CqlSession session = CqlSession.builder()
 
 If you are reusing code that configures SSL programmatically, you can use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/ssl/ProgrammaticSslEngineFactory.html[ProgrammaticSslEngineFactory] as an easy way to wrap that into a factory instance:
 
-[,java]
+[source,java]
 ----
 SSLContext sslContext = ...
 String[] cipherSuites = ...
@@ -174,7 +174,7 @@ CqlSession session =
 
 Finally, there is a convenient shortcut on the session builder if you just need to pass an `SSLContext`:
 
-[,java]
+[source,java]
 ----
 SSLContext sslContext = ...
 CqlSession session = CqlSession.builder()
@@ -182,7 +182,7 @@ CqlSession session = CqlSession.builder()
     .build();
 ----
 
-==== Netty-tcnative
+=== Netty-tcnative
 
 Netty supports native integration with OpenSSL / boringssl.
 The driver does not provide this out of the box, but with a bit of custom development it is fairly easy to add.

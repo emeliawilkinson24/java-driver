@@ -1,6 +1,6 @@
-== Logging
+= Logging
 
-=== Quick overview
+== Quick overview
 
 * based on SLF4J.
 * config file examples for Logback and Log4J.
@@ -12,7 +12,7 @@
 The driver uses https://www.slf4j.org/[SLF4J] as a logging facade.
 This allows you to plug in your preferred logging framework (java.util.logging, logback, log4j...) at deployment time.
 
-=== Setup
+== Setup
 
 To connect SLF4J to your logging framework, add a https://www.slf4j.org/manual.html#swapping[binding] JAR in your classpath.
 If you use a build tool such as Maven or Gradle, this usually involves adding a runtime dependency to your application descriptor (`pom.xml` or `build.gradle`).
@@ -53,17 +53,17 @@ both http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/AsyncAppender.
 This usually involves JMX and is available for http://logback.qos.ch/manual/jmxConfig.html[Logback];
 Log4J provides a `configureAndWatch()` method but it is not recommended to use it inside J2EE containers (see https://logging.apache.org/log4j/1.2/faq.html#a3.6[FAQ]).
 
-=== Taxonomy of driver logs
+== Taxonomy of driver logs
 
 The driver has a well-defined use for each log level.
 As an application developer/administrator, you should be focusing mostly on the `ERROR`, `WARN` and `INFO` levels.
 
-==== ERROR
+=== ERROR
 
 Something that renders the driver -- or a part of it -- completely unusable.
 An action is required to fix it: bouncing the client, applying a patch, etc.
 
-==== WARN
+=== WARN
 
 Something that the driver can recover from automatically, but indicates a configuration or programming error that should be addressed.
 For example:
@@ -79,7 +79,7 @@ will be returned, which may use different bound statement execution parameters (
 from the current session.prepare call. Consider preparing the statement only once. Query='...'
 ----
 
-==== INFO
+=== INFO
 
 Something that is part of the normal operation of the driver, but might be useful to know for an administrator.
 For example:
@@ -93,7 +93,7 @@ INFO  c.d.o.d.internal.core.time.Clock - Using native clock for microsecond prec
 INFO  c.d.o.d.i.c.c.t.DefaultDriverConfigLoader - [s0] Detected a configuration change
 ----
 
-==== DEBUG and TRACE
+=== DEBUG and TRACE
 
 These levels are intended primarily for driver developers;
 we might ask you to enable them to investigate an issue.
@@ -101,9 +101,9 @@ we might ask you to enable them to investigate an issue.
 Keep in mind that they are quite verbose, in particular TRACE.
 It's a good idea to only enable them on a limited set of categories.
 
-=== Configuration examples
+== Configuration examples
 
-==== Logback
+=== Logback
 
 Here is a sample configuration file for Logback.
 
@@ -150,7 +150,7 @@ The appenders send all messages of level INFO and above to the console, and all 
 </configuration>
 ----
 
-==== Log4J
+=== Log4J
 
 Here is a sample configuration file for Log4J.
 

@@ -1,4 +1,4 @@
-== Request execution
+= Request execution
 
 The link:../netty_pipeline/[Netty pipeline] gives us the ability to send low-level protocol messages on a single connection.
 
@@ -12,7 +12,7 @@ The session is the main entry point.
 It extends a more generic `Session` type, for the sake of extensibility;
 this will be explained in <<request-processors,Request processors>>.
 
-[,ditaa]
+[source,dita]
 ----
 +----------------------------------+
 | Session                          |
@@ -56,9 +56,9 @@ this will be explained in <<request-processors,Request processors>>.
 `DefaultSession` contains the session implementation.
 It follows the link:../common/concurrency/#cold-path[confined inner class] pattern to simplify concurrency.
 
-=== Connection pooling
+== Connection pooling
 
-[,ditaa]
+[source,dita]
 ----
 +----------------------+       1 +------------+
 | ChannelPool          +---------+ ChannelSet |
@@ -76,7 +76,7 @@ It follows the link:../common/concurrency/#cold-path[confined inner class] patte
 It follows the link:../common/concurrency/#cold-path[confined inner class] pattern to simplify concurrency.
 There are a few differences compared to the 3.x implementation:
 
-==== Fixed size
+=== Fixed size
 
 The pool has a fixed number of connections, it doesn't grow or shrink dynamically based on current usage.
 In other words, there is no more "max" size, only a "core" size.
@@ -88,7 +88,7 @@ The rationale for removing the dynamic behavior is that it introduced a ton of c
 If on the other hand the fluctuations are rare and predictable (e.g.
 peak for holiday sales), then a manual configuration change is good enough.
 
-==== No queuing
+=== No queuing
 
 To get a connection to a node, client code calls `ChannelPool.next()`.
 This returns the less busy connection, based on the the `getAvailableIds()` counter exposed by link:netty_pipeline/#in-flight-handler[InFlightHandler].
@@ -110,14 +110,14 @@ This is explained in detail in the javadocs of `DriverChannel.preAcquireId()`, r
 
 The pool manages its channels with `ChannelSet`, a simple copy-on-write data structure.
 
-==== Built-in reconnection
+=== Built-in reconnection
 
 The pool has its own independent reconnection mechanism (based on the `Reconnection` utility class).
 The goal is to keep the pool at its expected capacity: whenever a connection is lost, the task starts and will try to reopen the missing connections at regular intervals.
 
-=== Request processors
+== Request processors
 
-[,ditaa]
+[source,dita]
 ----
 +----------------------------------+
 | Session                          |
@@ -137,7 +137,7 @@ The goal is to keep the pool at its expected capacity: whenever a connection is 
 The driver can execute different types of requests, in different ways.
 This is abstracted by the top-level `Session` interface, with a very generic execution method:
 
-[,java]
+[source,java]
 ----
 <RequestT extends Request, ResultT> ResultT execute(
       RequestT request, GenericType<ResultT> resultType);
@@ -173,7 +173,7 @@ Each `(RequestT, ResultT)` combination defines an execution model, for example:
 In general, regular client code doesn't use `Session.execute` directly.
 Instead, child interfaces expose more user-friendly shortcuts for a given result type:
 
-[,java]
+[source,java]
 ----
 public interface CqlSession extends Session {
   default ResultSet execute(Statement<?> statement) {
@@ -186,7 +186,7 @@ The logic for each execution model is encapsulated in a `RequestProcessor<Reques
 Processors are stored in a `RequestProcessorRegistry`.
 For each request, the session invokes the registry to find the processor that matches the request and result types.
 
-[,ditaa]
+[source,dita]
 ----
 +----------------+  1+-----------------------------------+
 | DefaultSession +---+ RequestProcessorRegistry          |
@@ -239,7 +239,7 @@ You can observe this in `CqlRequestSyncProcessor`.
 Note that preparing a statement is treated as just another execution model.
 It has its own processors, that operate on a special `PrepareRequest` type:
 
-[,java]
+[source,java]
 ----
 public interface CqlSession extends Session {
   default PreparedStatement prepare(SimpleStatement statement) {
@@ -248,9 +248,9 @@ public interface CqlSession extends Session {
 }
 ----
 
-=== Extension points
+== Extension points
 
-==== RequestProcessorRegistry
+=== RequestProcessorRegistry
 
 You can customize the set of request processors by link:../common/context/#overriding-a-context-component[extending the context] and overriding `buildRequestProcessorRegistry`.
 
@@ -270,14 +270,14 @@ Note that the default async processors are not present in the registry anymore;
 if you try to call a method that returns a `CompletionStage`, it fails.
 See the next section for how to hide those methods.
 
-==== Exposing a custom session interface
+=== Exposing a custom session interface
 
 If you add or remove execution models, you probably want to expose a session interface that matches the underlying capabilities of the implementation.
 
 For example, in the https://github.com/datastax/java-driver/blob/4.x/integration-tests/src/test/java/com/datastax/oss/driver/core/session/RequestProcessorIT.java[RequestProcessorIT] example mentioned in the previous section, we remove the ability to return `CompletionStage`, but add the ability to return `ListenableFuture`.
 Therefore we expose a custom https://github.com/datastax/java-driver/blob/4.x/integration-tests/src/test/java/com/datastax/oss/driver/example/guava/api/GuavaSession.java[GuavaSession] with a different return type for async methods:
 
-[,java]
+[source,java]
 ----
 public interface GuavaSession extends Session {
   default ListenableFuture<AsyncResultSet> executeAsync(Statement<?> statement) { ... }
@@ -290,7 +290,7 @@ Our new methods all have default implementations in term of the abstract `Sessio
 The driver provides `SessionWrapper` to that effect.
 See https://github.com/datastax/java-driver/blob/4.x/integration-tests/src/test/java/com/datastax/oss/driver/example/guava/internal/DefaultGuavaSession.java[DefaultGuavaSession]:
 
-[,java]
+[source,java]
 ----
 public class DefaultGuavaSession extends SessionWrapper implements GuavaSession {
   public DefaultGuavaSession(Session delegate) {
@@ -304,7 +304,7 @@ Since we extended the context (see previous section), we already wrote a custom 
 there is another protected method we can override to plug our wrapper.
 See https://github.com/datastax/java-driver/blob/4.x/integration-tests/src/test/java/com/datastax/oss/driver/example/guava/api/GuavaSessionBuilder.java[GuavaSessionBuilder]:
 
-[,java]
+[source,java]
 ----
 public class GuavaSessionBuilder extends SessionBuilder<GuavaSessionBuilder, GuavaSession> {
 
@@ -319,7 +319,7 @@ public class GuavaSessionBuilder extends SessionBuilder<GuavaSessionBuilder, Gua
 
 Client code can now use the familiar pattern to create a session:
 
-[,java]
+[source,java]
 ----
 GuavaSession session = new GuavaSessionBuilder()
     .addContactEndPoints(...)

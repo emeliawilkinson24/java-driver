@@ -1,6 +1,6 @@
-== Connection pooling
+= Connection pooling
 
-=== Quick overview
+== Quick overview
 
 One connection pool per node.
 *Many concurrent requests* per connection (don't tune like a JDBC pool).
@@ -12,7 +12,7 @@ One connection pool per node.
 
 '''
 
-=== Basics
+== Basics
 
 The driver communicates with Cassandra over TCP, using the Cassandra binary protocol.
 This protocol is asynchronous, which allows each TCP connection to handle multiple simultaneous requests:
@@ -32,14 +32,14 @@ You simply interact with a https://docs.datastax.com/en/drivers/java/4.17/com/da
 The number of connections per pool is configurable (this will be described in the next section).
 There are up to 32768 stream ids per connection.
 
-[,ditaa]
+[source,dita]
 ----
 +-------+1     n+----+1     n+----------+1   32K+-------+
 +Session+-------+Pool+-------+Connection+-------+Request+
 +-------+       +----+       +----------+       +-------+
 ----
 
-=== Configuration
+== Configuration
 
 Pool sizes are defined in the `connection` section of the link:../configuration/[configuration].
 Here are the relevant options with their default values:
@@ -60,7 +60,7 @@ see the <<tuning,Tuning>> section at the end of this page.
 Unlike previous versions of the driver, pools do not resize dynamically.
 However you can adjust the options at runtime, the driver will detect and apply the changes.
 
-==== Heartbeat
+=== Heartbeat
 
 If connections stay idle for too long, they might be dropped by intermediate network devices (routers, firewalls...).
 Normally, TCP keepalive should take care of this;
@@ -84,7 +84,7 @@ datastax-java-driver.advanced.heartbeat {
 
 Both options can be changed at runtime, the new value will be used for new connections created after the change.
 
-=== Monitoring
+== Monitoring
 
 The driver exposes node-level link:../metrics/[metrics] to monitor your pools (note that all metrics are disabled by default, you'll need to change your configuration to enable them):
 
@@ -126,18 +126,18 @@ In particular, it's a good idea to keep an eye on those two metrics:
 * `pool.available-streams`: if this is often close to 0, it's a sign that the pool is getting saturated.
 Consider adding more connections per node.
 
-=== Tuning
+== Tuning
 
 The driver defaults should be good for most scenarios.
 
-==== Number of requests per connection
+=== Number of requests per connection
 
 In our experience, raising `max-requests-per-connection` above 1024 does not bring any significant improvement: the server is only going to service so many requests at a time anyway, so additional requests are just going to pile up.
 
 Lowering the value is not a good idea either.
 If your goal is to limit the global throughput of the driver, a link:../throttling[throttler] is a better solution.
 
-==== Number of connections per node
+=== Number of connections per node
 
 1 connection per node (`pool.local.size` or `pool.remote.size`) is generally sufficient.
 However, it might become a bottleneck in very high performance scenarios: all I/O for a connection happens on the same thread, so it's possible for that thread to max out its CPU core.

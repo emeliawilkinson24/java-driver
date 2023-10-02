@@ -1,10 +1,10 @@
-== Netty pipeline
+= Netty pipeline
 
 With the link:../native_protocol[protocol layer] in place, the next step is to build the logic for a single server connection.
 
 We use https://netty.io/[Netty] for network I/O (to learn more about Netty, https://www.manning.com/books/netty-in-action[this book] is an excellent resource).
 
-[,ditaa]
+[source,dita]
 ----
    +----------------+
    | ChannelFactory |
@@ -51,7 +51,7 @@ Incoming responses go the other way.
 
 Our pipeline is configured with the following handlers:
 
-=== SslHandler
+== SslHandler
 
 The implementation is provided by Netty (all the others handlers are custom implementations).
 
@@ -60,20 +60,20 @@ At the user-facing level, this is  abstracted behind `SslEngineFactory`, based o
 
 See also the <<extension-points,Extension points>> section below.
 
-=== FrameEncoder and FrameDecoder
+== FrameEncoder and FrameDecoder
 
 This is where we integrate the protocol layer, as explained link:../native_protocol/#integration-in-the-driver[here].
 
 Unlike the other pipeline stages, we use separate handlers for incoming and outgoing messages.
 
-=== HeartbeatHandler
+== HeartbeatHandler
 
 The heartbeat is a background request sent on inactive connections (no reads since x seconds), to make sure that they are still alive, and prevent them from being dropped by a firewall.
 This is similar to TCP_KeepAlive, but we provide an application-side alternative because users don't always have full control over their network configuration.
 
 `HeartbeatHandler` is based on Netty's built-in `IdleStateHandler`, so there's not much in there apart from the details of the control request.
 
-=== InFlightHandler
+== InFlightHandler
 
 This handler is where most of the connection logic resides.
 It is responsible for:
@@ -103,7 +103,7 @@ All communication between the handler and the outside world must be done through
 There are 3 exceptions to this rule: `getAvailableIds`, `getInflight` and `getOrphanIds`, which are based on volatile fields.
 They are all used for metrics, and `getAvailableIds` is also used to balance the load over connections to the same node (see `ChannelSet`).
 
-=== ProtocolInitHandler
+== ProtocolInitHandler
 
 This handler manages the protocol initialization sequence on a newly established connection (see the `STARTUP` message in the protocol specification).
 
@@ -114,9 +114,9 @@ This is abstracted in the parent class `ConnectInitHandler`.
 
 Once the initialization is complete, `ProtocolInitHandler` removes itself from the pipeline.
 
-=== Extension points
+== Extension points
 
-==== NettyOptions
+=== NettyOptions
 
 The `advanced.netty` section in the link:../../core/configuration/reference/[configuration] exposes a few high-level options.
 
@@ -127,7 +127,7 @@ This allows you to do things such as:
 * using Netty's https://netty.io/wiki/native-transports.html[native Epoll transport];
 * adding custom handlers to the pipeline.
 
-==== SslHandlerFactory
+=== SslHandlerFactory
 
 The link:../../core/ssl/[user-facing API] (`advanced.ssl-engine-factory` in the configuration, or `SessionBuilder.withSslContext` / `SessionBuilder.withSslEngineFactory`) only supports Java's default SSL implementation.
 

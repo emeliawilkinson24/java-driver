@@ -1,12 +1,13 @@
-== Graph options
+= Graph options
 
-There are various link:../../../configuration/[configuration] options that control the execution of graph statements.
+There are various xref:core:configuration.adoc[configuration] options that control the execution of graph statements.
 They can also be overridden programmatically on individual statements.
 
-=== Setting options
+== Setting options
 
 Given the following configuration:
 
+[source,java]
 ----
 datastax-java-driver {
 
@@ -22,7 +23,7 @@ datastax-java-driver {
 
 This statement inherits the timeout from the default profile:
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement = ScriptGraphStatement.newInstance("g.V().next()");
 assert statement.getTimeout().equals(Duration.ofSeconds(3));
@@ -30,17 +31,16 @@ assert statement.getTimeout().equals(Duration.ofSeconds(3));
 
 This statement inherits the timeout from a named profile:
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement =
     ScriptGraphStatement.newInstance("g.V().next()").setExecutionProfileName("graph-oltp");
 assert statement.getTimeout().equals(Duration.ofSeconds(30));
 ----
 
-This statement overrides the timeout programmatically;
-that takes precedence over the configuration:
+This statement overrides the timeout programmatically and takes precedence over the configuration:
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement =
     ScriptGraphStatement.newInstance("g.V().next()").setTimeout(Duration.ofSeconds(5));
@@ -48,27 +48,27 @@ ScriptGraphStatement statement =
 
 Programmatic overrides are also available in statement builders:
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement =
     ScriptGraphStatement.builder("g.V().next()").withTimeout(Duration.ofSeconds(5)).build();
 ----
 
-Whether you use the configuration or programmatic API depends on the use case;
-in general, we recommend trying execution profiles first, if you can identify static categories of statements that share the same options.
+Whether you use the configuration or programmatic API depends on the use case.
+We recommend trying execution profiles first if you can identify static categories of statements that share the same options.
 Resort to the API for specific options that only apply to a single statement, or if the value is only known at runtime.
 
-=== Available options
+== Available options
 
-==== Graph name
+=== Graph name
 
 The `basic.graph.name` option defines the name of the graph you're querying.
 
 This doesn't have to be set all the time.
-In fact, some queries explicitly require no graph name, for example those that access the `system` query.
+In fact, some queries explicitly require no graph name, such as those that access the `system` query.
 If you try to execute them with a graph name set, you'll get an error:
 
-[,java]
+[source,java]
 ----
 // Don't do this: executing a system query with the graph name set
 ScriptGraphStatement statement =
@@ -81,20 +81,21 @@ session.execute(statement);
 If you set the graph name globally in the configuration, you'll need to unset it for system queries.
 To do that, set it to `null`, or use the more explicit equivalent `is-system-query`:
 
+[source,java]
 ----
 datastax-java-driver {
   basic.graph.name = my_graph
 
   profiles {
     graph-system {
-      # Don't inherit the graph name here
+      # Do not inherit the graph name here
       basic.graph.is-system-query = true
     }
   }
 }
 ----
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement =
     ScriptGraphStatement.newInstance("system.graph('demo').ifNotExists().create()")
@@ -106,13 +107,13 @@ ScriptGraphStatement statement =
         .setSystemQuery(true);
 ----
 
-==== Traversal source
+=== Traversal source
 
 `basic.graph.traversal-source` defines the underlying engine used to create traversals.
 
 Set this to `g` for regular OLTP queries, or `a` for OLAP queries.
 
-==== Consistency level
+=== Consistency level
 
 Graph statements use the same option as CQL: `basic.request.consistency`.
 
@@ -122,7 +123,7 @@ The read and write consistency levels can be configured independently with `basi
 If any of these is set, it overrides the consistency level for that type of query;
 otherwise, the global option is used.
 
-==== Timeout
+=== Timeout
 
 Graph statements have a dedicated timeout option: `basic.graph.timeout`.
 This is because the timeout behaves a bit differently with DSE graph: by default, it is unset and the driver will wait until the server replies (there are server-side timeouts that limit how long the request will take).
@@ -130,17 +131,17 @@ This is because the timeout behaves a bit differently with DSE graph: by default
 If a timeout is defined on the client, the driver will fail the request after that time, without waiting for a reply.
 But the timeout is also sent alongside the initial request, and the server will adjust its own timeout to ensure that it doesn't keep working for a result that the client is no longer waiting for.
 
-==== Graph protocol version
+=== Graph protocol version
 
 DSE graph relies on the Cassandra native protocol, but it extends it with a sub-protocol that has its own versioning scheme.
 
 `advanced.graph.sub-protocol` controls the graph protocol version to use for each statement.
 It is unset by default, and you should almost never have to change it: the driver sets it automatically based on the information it knows about the server.
 
-There is one exception: if you use the link:../script/[script API] against a legacy DSE version (5.0.3 or older), the driver infers the wrong protocol version.
+There is one exception: if you use the xref:core:dse/graph/script-api.adoc[script API] against a legacy DSE version (5.0.3 or older), the driver infers the wrong protocol version.
 This manifests as a `ClassCastException` when you try to deserialize complex result objects, such as vertices:
 
-[,java]
+[source,java]
 ----
 GraphResultSet result =
     session.execute(ScriptGraphStatement.newInstance("g.V().next()"));

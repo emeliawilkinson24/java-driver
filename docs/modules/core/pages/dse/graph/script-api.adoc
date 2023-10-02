@@ -1,9 +1,9 @@
-== Script API
+= Script API
 
 The script API handles Gremlin-groovy requests provided as plain Java strings.
 To execute a script, wrap it into a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/ScriptGraphStatement.html[ScriptGraphStatement] and pass it to the session:
 
-[,java]
+[source,java]
 ----
 CqlSession session = CqlSession.builder().build();
 
@@ -12,16 +12,16 @@ ScriptGraphStatement statement = ScriptGraphStatement.newInstance(groovyScript);
 session.execute(statement);
 ----
 
-=== Creating script statements
+== Creating script statements
 
-==== Factory method
+=== Factory method
 
 As demonstrated above, the simplest way to create a script statement is to pass the Gremlin-groovy string to https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/ScriptGraphStatement.html#newInstance-java.lang.String-[ScriptGraphStatement.newInstance].
 
 The default implementation returned by the driver is *immutable*;
-if you call additional methods on the statement -- for example to set link:../options/[options] -- each method call will create a new copy:
+if you call additional methods on the statement -- for example to set xref:core:dse/graph/graph-options.adoc[options] -- each method call will create a new copy:
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement =
     ScriptGraphStatement.newInstance("system.graph('demo').ifNotExists().create()");
@@ -35,11 +35,11 @@ Immutability is good because it makes statements inherently *thread-safe*: you c
 On the other hand, it means a lot of intermediary copies if you often call methods on your statements.
 Modern VMs are normally good at dealing with such short-lived objects, but if you're worried about the performance impact, consider using a builder instead.
 
-==== Builder
+=== Builder
 
-Instead of creating a statement directly, you can pass your Gremlin-groovy string to https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/ScriptGraphStatement.html#builder-java.lang.String-[ScriptGraphStatement.builder], chain method calls to set options, and finally call `build()`:
+Instead of creating a statement directly, you can pass your Gremlin-groovy string to https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/ScriptGraphStatement.html#builder-java.lang.String-[`ScriptGraphStatement.builder`], chain method calls to set options, and finally call `build()`:
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement1 =
     ScriptGraphStatement.builder("system.graph('demo').ifNotExists().create()")
@@ -53,7 +53,7 @@ As a consequence, the builder object is *not thread-safe*.
 
 You can also initialize a builder from an existing statement: it will inherit all of its options.
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement2 =
     ScriptGraphStatement.builder(statement1).withTimeout(Duration.ofSeconds(20)).build();
@@ -63,14 +63,14 @@ assert statement2.getTimeout().equals(Duration.ofSeconds(20)); // overridden by 
 assert statement2.isIdempotent(); // because statement1 was
 ----
 
-=== Parameters
+== Parameters
 
 Gremlin-groovy scripts accept parameters, which are always named.
 Note that, unlike in CQL, placeholders are not prefixed with ":".
 
 To manage parameters on an existing statement, use `setQueryParam` / `removeQueryParam`:
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement =
     ScriptGraphStatement.newInstance("g.addV(label, vertexLabel)")
@@ -79,7 +79,7 @@ ScriptGraphStatement statement =
 
 On the builder, use `withQueryParam` / `withoutQueryParams`:
 
-[,java]
+[source,java]
 ----
 ScriptGraphStatement statement =
     ScriptGraphStatement.builder("g.addV(label, vertexLabel)")
@@ -89,13 +89,13 @@ ScriptGraphStatement statement =
 
 Alternatively, `withQueryParams` takes multiple parameters as a map.
 
-=== Use cases for the script API
+== Use cases for the script API
 
 Building requests as Java strings can be unwieldy, especially for long scripts.
 Besides, the script API is a bit less performant on the server side.
-Therefore we recommend the link:../fluent/[Fluent API] instead for graph traversals.
+Therefore we recommend the xref:core:dse/graph/fluent/fluent-api.adoc[Fluent API] instead for graph traversals.
 
-Note however that some types of queries can only be performed through the script API:
+Note that some types of queries can only be performed through the script API:
 
 * system queries (e.g.
 creating / dropping a graph);

@@ -1,6 +1,6 @@
-== Authentication
+= Authentication
 
-=== Quick overview
+== Quick overview
 
 * `advanced.auth-provider` in the configuration.
 * disabled by default.
@@ -14,7 +14,7 @@ To use it, you must provide an _auth provider_ that will authenticate with the s
 
 This can be done in two ways:
 
-=== In the configuration
+== In the configuration
 
 Define an `auth-provider` section in the link:../configuration/[configuration]:
 
@@ -28,7 +28,7 @@ datastax-java-driver {
 
 The auth provider must be configured before opening a session, it cannot be changed at runtime.
 
-==== Plain text
+=== Plain text
 
 `PlainTextAuthProvider` supports simple username/password authentication (intended to work with the server-side `PasswordAuthenticator`).
 The credentials can be changed at runtime, they will be used for new connection attempts once the configuration gets reloaded.
@@ -60,7 +60,7 @@ datastax-java-driver {
 
 Note that, for backward compatibility with previous driver versions, you can also use the class name `DsePlainTextAuthProvider` to enable this provider.
 
-==== GSSAPI (DSE only)
+=== GSSAPI (DSE only)
 
 `DseGssApiAuthProvider` supports GSSAPI authentication against a DSE cluster secured with Kerberos:
 
@@ -80,7 +80,7 @@ datastax-java-driver {
 
 See the comments in link:../configuration/reference/[reference.conf] for more details.
 
-==== Custom
+=== Custom
 
 You can also write your own provider;
 it must implement https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/auth/AuthProvider.html[AuthProvider] and declare a public constructor with a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/context/DriverContext.html[DriverContext] argument.
@@ -94,11 +94,11 @@ datastax-java-driver {
 }
 ----
 
-=== Programmatically
+== Programmatically
 
 You can also pass an authenticator instance while building the session:
 
-[,java]
+[source,java]
 ----
 CqlSession session =
     CqlSession.builder()
@@ -109,7 +109,7 @@ CqlSession session =
 The driver also offers a simple, built-in plain text authentication provider: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/auth/ProgrammaticPlainTextAuthProvider.html[ProgrammaticPlainTextAuthProvider].
 The following is equivalent to using `PlainTextAuthProvider` in the configuration:
 
-[,java]
+[source,java]
 ----
 AuthProvider authProvider = new ProgrammaticPlainTextAuthProvider("user", "pass");
 
@@ -121,7 +121,7 @@ CqlSession session =
 
 For convenience, there are shortcuts that take the credentials directly:
 
-[,java]
+[source,java]
 ----
 CqlSession session =
     CqlSession.builder()
@@ -142,7 +142,7 @@ https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/
 
 Similarly, https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/auth/ProgrammaticDseGssApiAuthProvider.html[ProgrammaticDseGssApiAuthProvider] lets you configure GSSAPI programmatically:
 
-[,java]
+[source,java]
 ----
 import com.datastax.dse.driver.api.core.auth.DseGssApiAuthProviderBase.GssApiOptions;
 
@@ -157,7 +157,7 @@ CqlSession session = CqlSession.builder()
 For more complex needs (e.g.
 if building the options once and reusing them doesn't work for you), you can subclass https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/auth/DseGssApiAuthProviderBase.html[DseGssApiAuthProviderBase].
 
-=== Proxy authentication
+== Proxy authentication
 
 DSE allows a user to connect as another user or role:
 
@@ -200,7 +200,7 @@ datastax-java-driver {
  }
 ----
 
-=== Proxy execution
+== Proxy execution
 
 Proxy execution is similar to proxy authentication, but it applies to a single query, not the whole session.
 
@@ -212,7 +212,7 @@ GRANT PROXY.EXECUTE ON ROLE 'alice' TO 'bob'
 For this scenario, you would *not* add the `authorization-id = alice` to your configuration.
 Instead, use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/auth/ProxyAuthentication.html#executeAs-java.lang.String-StatementT-[ProxyAuthentication.executeAs] to wrap your query with the correct authorization for the execution:
 
-[,java]
+[source,java]
 ----
 import com.datastax.dse.driver.api.core.auth.ProxyAuthentication;
 

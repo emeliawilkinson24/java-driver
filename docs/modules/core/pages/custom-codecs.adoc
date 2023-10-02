@@ -1,6 +1,6 @@
-== Custom codecs
+= Custom codecs
 
-=== Quick overview
+== Quick overview
 
 Define custom Java to CQL mappings.
 
@@ -9,7 +9,7 @@ Define custom Java to CQL mappings.
  ** at init time: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#addTypeCodecs-com.datastax.oss.driver.api.core.type.codec.TypeCodec...-[CqlSession.builder().addTypeCodecs()]
  ** at runtime:
 +
-[,java]
+[source,java]
 ----
 MutableCodecRegistry registry =
     (MutableCodecRegistry) session.getContext().getCodecRegistry();
@@ -24,7 +24,7 @@ registry.register(myCodec);
 Out of the box, the driver comes with link:../#cql-to-java-type-mapping[default CQL to Java mappings].
 For example, if you read a CQL `text` column, it is mapped to its natural counterpart `java.lang.String`:
 
-[,java]
+[source,java]
 ----
 // cqlsh:ks> desc table test;
 // CREATE TABLE ks.test (k int PRIMARY KEY, v text)...
@@ -40,20 +40,20 @@ Sometimes you might want to use different mappings, for example:
 
 Custom codecs allow you to define those dedicated mappings, and plug them into your session.
 
-=== Using alternative codecs provided by the driver
+== Using alternative codecs provided by the driver
 
 The first thing you can do is use one of the many alternative codecs shipped with the driver.
 They are exposed on the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/ExtraTypeCodecs.html[ExtraTypeCodecs] class.
 In this section we are going to introduce these codecs, then you will see how to register and use them in the next sections.
 
-==== Mapping CQL blobs to Java arrays
+=== Mapping CQL blobs to Java arrays
 
 The driver default is https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/TypeCodecs.html#BLOB[TypeCodecs.BLOB], which maps CQL `blob` to Java's https://docs.oracle.com/javase/8/docs/api/java/nio/ByteBuffer.html[java.nio.ByteBuffer].
 Check out our https://github.com/datastax/java-driver/blob/4.x/examples/src/main/java/com/datastax/oss/driver/examples/datatypes/Blobs.java[CQL blob example] to understand how to manipulate the `ByteBuffer` API correctly.
 
 If the `ByteBuffer` API is too cumbersome for you, an alternative is to use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/ExtraTypeCodecs.html#BLOB_TO_ARRAY[ExtraTypeCodecs.BLOB_TO_ARRAY] which maps CQL blobs to Java's `byte[]`.
 
-==== Mapping CQL lists to Java arrays
+=== Mapping CQL lists to Java arrays
 
 By default, the driver maps CQL `list` to Java's https://docs.oracle.com/javase/8/docs/api/java/util/List.html[java.util.List].
 If you prefer to deal with  arrays, the driver offers the following codecs:
@@ -95,12 +95,12 @@ If you prefer to deal with  arrays, the driver offers the following codecs:
 . For other types, you should use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/ExtraTypeCodecs.html#listToArrayOf-com.datastax.oss.driver.api.core.type.codec.TypeCodec-[ExtraTypeCodecs.listToArrayOf(TypeCodec)];
 for example, to map CQL `list<text>` to `String[]`:
 +
-[,java]
+[source,java]
 ----
  TypeCodec<String[]> stringArrayCodec = ExtraTypeCodecs.listToArrayOf(TypeCodecs.TEXT);
 ----
 
-==== Mapping CQL timestamps to Java "instant" types
+=== Mapping CQL timestamps to Java "instant" types
 
 By default, the driver maps CQL `timestamp` to Java's https://docs.oracle.com/javase/8/docs/api/java/time/Instant.html[java.time.Instant] (using https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/TypeCodecs.html#TIMESTAMP[TypeCodecs.TIMESTAMP]).
 This is the most natural mapping, since neither type contains any time zone information: they just represent absolute points in time.
@@ -158,7 +158,7 @@ But if asked to format it, they behave differently:
 * `ExtraTypeCodecs.TIMESTAMP_UTC` returns `'1970-01-01T00:00:00.000Z'`
 * `ExtraTypeCodecs.timestampAt(ZoneId.of("Europe/Paris")` returns `'1970-01-01T01:00:00.000+01:00'`
 
-==== Mapping CQL timestamps to `ZonedDateTime`
+=== Mapping CQL timestamps to `ZonedDateTime`
 
 If your application works with one single, pre-determined time zone, then you probably would like the driver to map `timestamp` to https://docs.oracle.com/javase/8/docs/api/java/time/ZonedDateTime.html[java.time.ZonedDateTime] with a fixed zone.
 Use one of the following codecs:
@@ -197,7 +197,7 @@ When reading column `ts`:
 
 These are two distinct `ZonedDateTime` instances: although they represent the same absolute point in time, they do not compare as equal.
 
-==== Mapping CQL timestamps to `LocalDateTime`
+=== Mapping CQL timestamps to `LocalDateTime`
 
 If your application works with one single, pre-determined time zone, but only exposes local date-times, then you probably would like the driver to map timestamps to https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html[java.time.LocalDateTime] obtained from a fixed zone.
 Use one of the following codecs:
@@ -234,7 +234,7 @@ When reading column `ts`:
 * `ExtraTypeCodecs.LOCAL_TIMESTAMP_UTC` returns `LocalDateTime.of(1970, 1, 1, 0, 0)`
 * `ExtraTypeCodecs.localTimestampAt(ZoneId.of("Europe/Paris"))` returns `LocalDateTime.of(1970, 1, 1, 1, 0)`
 
-==== Storing the time zone in Cassandra
+=== Storing the time zone in Cassandra
 
 If your application needs to remember the time zone that each date was entered with, you need to store it in the database.
 We suggest using a `tuple<timestamp, text>`, where the second component holds the https://docs.oracle.com/javase/8/docs/api/java/time/ZoneId.html[zone id].
@@ -257,18 +257,18 @@ When reading column `zts`, `ExtraTypeCodecs.ZONED_TIMESTAMP_PERSISTED` returns:
 Each value is read back in the time zone that it was written with.
 But note that you can still compare rows on a absolute timeline with the `timestamp` component of the tuple.
 
-==== Mapping to `Optional` instead of `null`
+=== Mapping to `Optional` instead of `null`
 
 If you prefer to deal with https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html[java.util.Optional] in your application instead of nulls, then you can  use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/ExtraTypeCodecs.html#optionalOf-com.datastax.oss.driver.api.core.type.codec.TypeCodec-[ExtraTypeCodecs.optionalOf(TypeCodec)]:
 
-[,java]
+[source,java]
 ----
 TypeCodec<Optional<UUID>> optionalUuidCodec = ExtraTypeCodecs.optionalOf(TypeCodecs.UUID);
 ----
 
 Note that because the CQL native protocol does not distinguish empty collections from null  collection references, this codec will also map empty collections to https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html#empty--[Optional.empty()].
 
-==== Mapping Java Enums
+=== Mapping Java Enums
 
 Java https://docs.oracle.com/javase/8/docs/api/java/lang/Enum.html[Enums] can be mapped to CQL in two ways:
 
@@ -287,7 +287,7 @@ It is then fairly straightforward to  implement a codec with <<creating-custom-j
 
 For example, assuming the following enum:
 
-[,java]
+[source,java]
 ----
 public enum WeekDay {
   MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
@@ -296,7 +296,7 @@ public enum WeekDay {
 
 You can define codecs for it the following ways:
 
-[,java]
+[source,java]
 ----
 // MONDAY will be persisted as "MONDAY", TUESDAY as "TUESDAY", etc.
 TypeCodec<String> weekDaysByNameCodec = ExtraTypeCodecs.enumNamesOf(WeekDay.class);
@@ -305,13 +305,13 @@ TypeCodec<String> weekDaysByNameCodec = ExtraTypeCodecs.enumNamesOf(WeekDay.clas
 TypeCodec<Integer> weekDaysByNameCodec = ExtraTypeCodecs.enumOrdinalsOf(WeekDay.class);
 ----
 
-==== Mapping Json
+=== Mapping Json
 
 The driver provides out-of-the-box support for mapping Java objects to CQL `text` using the popular Jackson library.
 The method https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/ExtraTypeCodecs.html#json-java.lang.Class-[ExtraTypeCodecs.json(Class)] will create a codec for a given Java class that maps instances of that class to Json strings, using a newly-allocated, default http://fasterxml.github.io/jackson-databind/javadoc/2.10/com/fasterxml/jackson/databind/ObjectMapper.html[ObjectMapper].
 It is also possible to pass a custom `ObjectMapper` instance using https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/ExtraTypeCodecs.html#json-java.lang.Class-com.fasterxml.jackson.databind.ObjectMapper-[ExtraTypeCodecs.json(Class, ObjectMapper)] instead.
 
-==== Mapping CQL vectors to Java array
+=== Mapping CQL vectors to Java array
 
 By default, the driver maps CQL `vector` to the [CqlVector] value type.
 If you prefer to deal with arrays, the driver offers the following codec:
@@ -326,14 +326,14 @@ If you prefer to deal with arrays, the driver offers the following codec:
 
 This release only provides a codec for vectors containing float values.
 
-=== Writing codecs
+== Writing codecs
 
 If none of the driver built-in codecs above suits you, it is also possible to roll your own.
 
 To write a custom codec, implement the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/TypeCodec.html[TypeCodec] interface.
 Here is an example that maps a CQL `int` to a Java string containing its textual representation:
 
-[,java]
+[source,java]
 ----
 public class CqlIntToStringCodec implements TypeCodec<String> {
 
@@ -349,7 +349,7 @@ public class CqlIntToStringCodec implements TypeCodec<String> {
 
   @Override
   public ByteBuffer encode(String value, ProtocolVersion protocolVersion) {
-    if (value == null) {
+    if (value = null) {
       return null;
     } else {
       int intValue = Integer.parseInt(value);
@@ -372,7 +372,7 @@ public class CqlIntToStringCodec implements TypeCodec<String> {
   @Override
   public String parse(String value) {
     Integer intValue = TypeCodecs.INT.parse(value);
-    return intValue == null ? null : intValue.toString();
+    return intValue = null ? null : intValue.toString();
   }
 }
 ----
@@ -385,12 +385,12 @@ Refer to the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/dri
 Very often, this is the best approach to keep the code simple.
 If you want to handle the binary encoding yourself (maybe to squeeze the last bit of performance), study the driver's https://github.com/datastax/java-driver/tree/4.x/core/src/main/java/com/datastax/oss/driver/internal/core/type/codec[built-in codec implementations].
 
-=== Using codecs
+== Using codecs
 
 Once you have your codec, register it when building your session.
 The following example registers `CqlIntToStringCodec` along with a few driver-supplied alternative codecs:
 
-[,java]
+[source,java]
 ----
 enum WeekDay { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY };
 class Price {
@@ -413,7 +413,7 @@ CqlSession session =
 
 You may also add codecs to an existing session at runtime:
 
-[,java]
+[source,java]
 ----
 // The cast is required for backward compatibility reasons (registry mutability was introduced in
 // 4.3.0). It is safe as long as you didn't write a custom registry implementation.
@@ -425,7 +425,7 @@ registry.register(new CqlIntToStringCodec());
 
 You can now use the new mappings in your code:
 
-[,java]
+[source,java]
 ----
 // cqlsh:ks> desc table test2;
 // CREATE TABLE ks.test2 (k int PRIMARY KEY, v int)...
@@ -449,7 +449,7 @@ for example, there is no  accessor for `ZonedDateTime` or for `Optional<UUID>`, 
 When you want to retrieve such objects, you need a way to tell the driver which Java type you want.
 You do so by using one of the generic `get` and `set` methods:
 
-[,java]
+[source,java]
 ----
 // Assuming that ExtraTypeCodecs.ZONED_TIMESTAMP_PERSISTED was registered
 // Assuming that ExtraTypeCodecs.BLOB_TO_ARRAY was registered
@@ -470,7 +470,7 @@ boundStatement.set("v3", v3, String[].class);
 This is also valid for arbitrary Java types.
 This is particularly useful when dealing with Enums and  JSON mappings, for example our `WeekDay` and `Price` types:
 
-[,java]
+[source,java]
 ----
 // Assuming that TypeCodecs.enumNamesOf(WeekDay.class) was registered
 // Assuming that TypeCodecs.json(Price.class) was registered
@@ -486,7 +486,7 @@ boundStatement.set("v2", v2, Price.class);
 
 Note that, because the underlying CQL type is `text` you can still retrieve the column's contents as a plain string:
 
-[,java]
+[source,java]
 ----
 // Reading
 String enumName = row.getString("v1");
@@ -499,7 +499,7 @@ boundStatement.setString("v2", priceJson);
 
 And finally, for `Optional<UUID>`, you will need the `get` and `set` methods with an extra _type  token_ argument, because `Optional<UUID>` is a parameterized type:
 
-[,java]
+[source,java]
 ----
 // Assuming that TypeCodecs.optionalOf(TypeCodecs.UUID) was registered
 
@@ -515,7 +515,7 @@ They are immutable and thread-safe, you should store them as reusable constants.
 The `GenericType` class itself has constants and factory methods to help creating `GenericType` objects for common types.
 If you don't see the type you are looking for, a type token for any Java type can be created using the following pattern:
 
-[,java]
+[source,java]
 ----
 // Notice the '{}': this is an anonymous inner class
 GenericType<Foo<Bar>> fooBarType = new GenericType<Foo<Bar>>(){};
@@ -526,7 +526,7 @@ Foo<Bar> v = row.get("v", fooBarType);
 Custom codecs are used not only for their base type, but also recursively in collections, tuples and UDTs.
 For example, once your Json codec for the `Price` class is registered, you can also read a CQL `list<text>` as a Java `List<Price>`:
 
-[,java]
+[source,java]
 ----
 // Assuming that TypeCodecs.json(Price.class) was registered
 // Assuming that each element of the list<text> column is a valid Json string
@@ -549,7 +549,7 @@ Note that this means that built-in mappings can't be overridden.
 In rare cases, you might have a codec registered in your application, but have a legitimate reason to use a different mapping in one particular place.
 In that case, you can pass a codec instance  to `get` / `set` instead of a type token:
 
-[,java]
+[source,java]
 ----
 TypeCodec<String> defaultCodec = new CqlIntToStringCodec();
 TypeCodec<String> specialCodec = ...; // a different implementation
@@ -564,14 +564,14 @@ String s2 = row.get("anIntColumn", specialCodec); // int -> String, will decode 
 By doing so, you bypass the codec registry completely and instruct the driver to use the given  codec.
 Note that it is your responsibility to ensure that the codec can handle the underlying CQL type (this cannot be enforced at compile-time).
 
-=== Creating custom Java-to-CQL mappings with `MappingCodec`
+== Creating custom Java-to-CQL mappings with `MappingCodec`
 
 The above example, `CqlIntToStringCodec`, could be rewritten to leverage https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/MappingCodec.html[MappingCodec], an abstract  class that ships with the driver.
 This class has been designed for situations where we want to  represent a CQL type with a different Java type than the Java type natively supported by the driver, and the conversion between the former and the latter is straightforward.
 
 All you have to do is extend `MappingCodec` and implement two methods that perform the conversion  between the supported Java type -- or "inner" type -- and the target Java type -- or "outer" type:
 
-[,java]
+[source,java]
 ----
 public class CqlIntToStringCodec extends MappingCodec<Integer, String> {
 
@@ -582,13 +582,13 @@ public class CqlIntToStringCodec extends MappingCodec<Integer, String> {
   @Nullable
   @Override
   protected String innerToOuter(@Nullable Integer value) {
-    return value == null ? null : value.toString();
+    return value = null ? null : value.toString();
   }
 
   @Nullable
   @Override
   protected Integer outerToInner(@Nullable String value) {
-    return value == null ? null : Integer.parseInt(value);
+    return value = null ? null : Integer.parseInt(value);
   }
 }
 ----
@@ -602,7 +602,7 @@ CREATE TYPE coordinates (x int, y int);
 
 And let's suppose that we want to map it to the following Java class:
 
-[,java]
+[source,java]
 ----
 public class Coordinates {
   public final int x;
@@ -613,7 +613,7 @@ public class Coordinates {
 
 All  you have to do is create a `MappingCodec` subclass that piggybacks on an existing  `TypeCodec<UdtValue>` for the above user-defined type:
 
-[,java]
+[source,java]
 ----
 public class CoordinatesCodec extends MappingCodec<UdtValue, Coordinates> {
 
@@ -626,18 +626,18 @@ public class CoordinatesCodec extends MappingCodec<UdtValue, Coordinates> {
   }
 
   @Nullable @Override protected Coordinates innerToOuter(@Nullable UdtValue value) {
-    return value == null ? null : new Coordinates(value.getInt("x"), value.getInt("y"));
+    return value = null ? null : new Coordinates(value.getInt("x"), value.getInt("y"));
   }
 
   @Nullable @Override protected UdtValue outerToInner(@Nullable Coordinates value) {
-    return value == null ? null : getCqlType().newValue().setInt("x", value.x).setInt("y", value.y);
+    return value = null ? null : getCqlType().newValue().setInt("x", value.x).setInt("y", value.y);
   }
 }
 ----
 
 Then the new mapping codec could be registered as follows:
 
-[,java]
+[source,java]
 ----
 CqlSession session = ...
 CodecRegistry codecRegistry = session.getContext().getCodecRegistry();
@@ -657,7 +657,7 @@ CoordinatesCodec coordinatesCodec = new CoordinatesCodec(innerCodec);
 ----
 
 ...and used just like explained above:
-[,java]
+[source,java]
 ----
 BoundStatement stmt = ...;
 stmt.set("coordinates", new Coordinates(10,20), Coordinates.class);
@@ -668,11 +668,11 @@ Coordinates coordinates = row.get("coordinates", Coordinates.class);
 
 NOTE: if you need even more advanced mapping capabilities, consider adopting the driver's link:../../mapper/[object mapping framework].
 
-=== Subtype polymorphism
+== Subtype polymorphism
 
 Suppose the following class hierarchy:
 
-[,java]
+[source,java]
 ----
 class Animal {}
 class Cat extends Animal {}
@@ -685,7 +685,7 @@ for example, the driver has a built-in codec that handles `List` instances, and 
 
 But this has one caveat: when setting or retrieving values with `get()` and `set()`, _you must pass the exact Java type the codec handles_:
 
-[,java]
+[source,java]
 ----
 BoundStatement bs = ...
 bs.set(0, new Cat(), Animal.class); // works
@@ -696,11 +696,11 @@ Animal animal = row.get(0, Animal.class); // works
 Cat    cat    = row.get(0,    Cat.class); // throws CodecNotFoundException
 ----
 
-=== The codec registry
+== The codec registry
 
 The driver stores all codecs (built-in and custom) in an internal https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/type/codec/registry/CodecRegistry.html[CodecRegistry]:
 
-[,java]
+[source,java]
 ----
 CodecRegistry getCodecRegistry = session.getContext().getCodecRegistry();
 
@@ -711,7 +711,7 @@ TypeCodec<String> cqlIntToString = codecRegistry.codecFor(DataTypes.INT, Generic
 If all you're doing is executing requests and reading responses, you probably won't ever need to access the registry directly.
 But it's useful if you do some kind of generic processing, for example printing out an arbitrary row when the schema is not known at compile time:
 
-[,java]
+[source,java]
 ----
 private static String formatRow(Row row) {
   StringBuilder result = new StringBuilder();

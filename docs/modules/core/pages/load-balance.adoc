@@ -1,6 +1,6 @@
-== Load balancing
+= Load balancing
 
-=== Quick overview
+== Quick overview
 
 Which nodes the driver talks to, and in which order they are tried.
 
@@ -24,9 +24,9 @@ datastax-java-driver.basic.load-balancing-policy {
 }
 ----
 
-=== Concepts
+== Concepts
 
-==== Node distance
+=== Node distance
 
 For each node, the policy computes a _distance_ that determines how connections will be established:
 
@@ -41,7 +41,7 @@ It can also change over time.
 
 The driver built-in policies only ever assign the `LOCAL` or `IGNORED` distance, to avoid cross- datacenter traffic (see below to understand how to change this behavior).
 
-==== Query plan
+=== Query plan
 
 Each time the driver executes a query, it asks the policy to compute a _query plan_, in other words a list of nodes.
 The driver then tries each node in sequence, moving down the plan according to the link:../retries/[retry policy] and link:../speculative_execution/[speculative execution policy].
@@ -53,7 +53,7 @@ The contents and order of query plans are entirely implementation-specific, but 
 neither ignored nor down;
 * favor local nodes over remote ones.
 
-=== Built-in policies
+== Built-in policies
 
 In previous versions, the driver provided a wide variety of built-in load balancing policies;
 in addition, they could be nested into each other, yielding an even higher number of choices.
@@ -75,12 +75,12 @@ it should not be used as is in normal applications.
 
 You can still write a <<custom-implementation,custom implementation>> if you have special requirements.
 
-==== Datacenter locality
+=== Datacenter locality
 
 By default, both `DefaultLoadBalancingPolicy` and `DcInferringLoadBalancingPolicy` *only connect to  a single datacenter*.
 The rationale is that a typical multi-region deployment will collocate one or  more application instances with each Cassandra datacenter:
 
-[,ditaa]
+[source,dita]
 ----
                   /----+----\
                   | client  |
@@ -119,7 +119,7 @@ datastax-java-driver.basic.load-balancing-policy {
 
 Or programmatically when building the session:
 
-[,java]
+[source,java]
 ----
 CqlSession session = CqlSession.builder()
     .withLocalDatacenter("datacenter1")
@@ -132,7 +132,7 @@ For convenience, the local datacenter name may be omitted if no contact points w
 This is just for a better out-of-the-box experience for users who have just downloaded the driver;
 beyond that initial development phase, you should provide explicit contact points and a local datacenter.
 
-===== Finding the local datacenter
+==== Finding the local datacenter
 
 To check which datacenters are defined in a given cluster, you can run https://docs.datastax.com/en/dse/6.7/dse-dev/datastax_enterprise/tools/nodetool/toolsStatus.html[`nodetool status`].
 It will  print information about each node in the cluster, grouped by datacenters.
@@ -172,7 +172,7 @@ data_center
 DC1
 ----
 
-==== Cross-datacenter failover
+=== Cross-datacenter failover
 
 Since the driver by default only contacts nodes in the local datacenter, what happens if the whole datacenter is down?
 Resuming the example shown in the diagram above, shouldn't the driver temporarily allow app1 to connect to the nodes in DC2?
@@ -213,7 +213,7 @@ datastax-java-driver.advanced.load-balancing-policy.dc-failover {
 }
 ----
 
-===== Alternatives to driver-level cross-datacenter failover
+==== Alternatives to driver-level cross-datacenter failover
 
 Before you jump into the failover technique explained above, please also consider the following alternatives:
 
@@ -228,11 +228,11 @@ To resume our example above, if Region1 goes down, the load balancers in your in
 This is by far the best solution for the cross-datacenter failover issue in general, but we acknowledge that it also requires a purpose-built infrastructure.
 To help you explore this option, read our https://www.datastax.com/sites/default/files/content/whitepaper/files/2019-09/Designing-Fault-Tolerant-Applications-DataStax.pdf[white paper].
 
-==== Token-aware
+=== Token-aware
 
 The default policy is *token-aware* by default: requests will be routed in priority to the replicas that own the data being queried.
 
-===== Providing routing information
+==== Providing routing information
 
 First make sure that link:../metadata/token/#configuration[token metadata] is enabled.
 
@@ -252,15 +252,15 @@ CREATE TABLE testKs.sensor_data(id int, year int, ts timestamp, data double,
 
 For link:../statements/simple/[simple statements], routing information is never computed automatically:
 
-[,java]
+[source,java]
 ----
 SimpleStatement statement =
     SimpleStatement.newInstance(
         "SELECT * FROM testKs.sensor_data WHERE id = 1 and year = 2016");
 
 // No routing info available:
-assert statement.getRoutingKeyspace() == null;
-assert statement.getRoutingKey() == null;
+assert statement.getRoutingKeyspace() = null;
+assert statement.getRoutingKey() = null;
 
 // Set the keyspace manually (skip this if using a per-query keyspace):
 statement = statement.setRoutingKeyspace("testKs");
@@ -276,7 +276,7 @@ session.execute(statement);
 For link:../statements/prepared/[bound statements], the keyspace is always available;
 the routing key is only available if all components of the partition key are bound as variables:
 
-[,java]
+[source,java]
 ----
 // All components bound: all info available
 PreparedStatement pst1 =
@@ -292,14 +292,14 @@ PreparedStatement pst2 =
 BoundStatement statement2 = pst2.bind(2016);
 
 assert statement2.getRoutingKeyspace() != null;
-assert statement2.getRoutingKey() == null;
+assert statement2.getRoutingKey() = null;
 ----
 
 For link:../statements/batch/[batch statements], the routing information of each child statement is inspected;
 the first non-null keyspace is used as the keyspace of the batch, and the first non-null routing key as its routing key (the idea is that all children should have the same routing information, since batches are supposed to operate on a single partition).
 If no child has any routing information, you need to provide it manually.
 
-===== Policy behavior
+==== Policy behavior
 
 When the policy computes a query plan, it first inspects the statement's routing information.
 If there isn't any, the query plan is a simple round-robin shuffle of all connected nodes that are located in the local datacenter.
@@ -312,7 +312,7 @@ With the driver built-in policies, remote nodes always come after local nodes in
 If the local datacenter goes down however, all the local nodes in query plans will likely fail, causing the query plans to eventually try remote nodes instead.
 If the local datacenter unavailability persists, local nodes will be eventually marked down and will be removed from query plans completely from query plans, until they are back up again.
 
-==== Customizing node distance assignment
+=== Customizing node distance assignment
 
 Finally, all the driver the built-in policies accept an optional node distance evaluator that gets invoked each time a node is added to the cluster or comes back up.
 If the evaluator returns a non-null distance for the node, that distance will be used, otherwise the driver will use its built-in logic to assign a default distance to it.
@@ -333,7 +333,7 @@ The node distance evaluator class must implement https://docs.datastax.com/en/dr
 Sometimes it's more convenient to pass the evaluator programmatically;
 you can do that with `SessionBuilder.withNodeDistanceEvaluator`:
 
-[,java]
+[source,java]
 ----
 Map<Node, NodeDistance> distances = ...
 CqlSession session = CqlSession.builder()
@@ -343,14 +343,14 @@ CqlSession session = CqlSession.builder()
 
 If a programmatic node distance evaluator evaluator is provided, the configuration option is ignored.
 
-=== Custom implementation
+== Custom implementation
 
 You can use your own implementation by specifying its fully-qualified name in the configuration.
 
 Study the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/loadbalancing/LoadBalancingPolicy.html[LoadBalancingPolicy] interface and the built-in [BasicLoadingBalancingPolicy] for the low-level details.
 Feel free to extend `BasicLoadingBalancingPolicy` and override only the methods that you wish to modify -- but keep in mind that it may be simpler to just start from scratch.
 
-=== Using multiple policies
+== Using multiple policies
 
 The load balancing policy can be overridden in link:../configuration/#profiles[execution profiles]:
 

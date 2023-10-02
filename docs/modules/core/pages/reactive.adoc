@@ -1,4 +1,4 @@
-== Reactive Style Programming
+= Reactive Style Programming
 
 The driver provides built-in support for reactive queries.
 The https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/CqlSession.html[CqlSession] interface extends https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/cql/reactive/ReactiveSession.html[ReactiveSession], which adds specialized methods to execute requests expressed in https://en.wikipedia.org/wiki/Reactive_Streams[reactive streams].
@@ -12,11 +12,11 @@ If the library cannot be found at runtime, reactive queries won't be available, 
 however, reactive queries also work with regular Cassandra.
 * The reactive execution model is implemented in a non-blocking fashion: see the manual page on  link:../non_blocking[non-blocking programming] for details.
 
-=== Overview
+== Overview
 
 `ReactiveSession` exposes two public methods:
 
-[,java]
+[source,java]
 ----
 ReactiveResultSet executeReactive(String query);
 ReactiveResultSet executeReactive(Statement<?> statement);
@@ -35,16 +35,16 @@ We provide a few examples of caching further in this document.
 Subscriber implementors are encouraged to abide by https://github.com/reactive-streams/reactive-streams-jvm#2.2[Reactive Streams Specification rule   2.2] and avoid performing heavy computations or blocking calls inside `onNext` calls, as doing so   could slow down the driver and impact performance.
 Instead, they should asynchronously dispatch   received signals to their processing logic.
 
-=== Basic usage
+== Basic usage
 
 The examples in this page make usage of https://projectreactor.io/[Reactor], a popular reactive library, but they should be easily adaptable to any other library implementing the concepts of reactive streams.
 
-==== Reading in reactive style
+=== Reading in reactive style
 
 The following example reads from a table and prints all the returned rows to the console.
 In case of error, a `DriverException` is thrown and its stack trace is printed to standard error:
 
-[,java]
+[source,java]
 ----
 try (CqlSession session = ...) {
       Flux.from(session.executeReactive("SELECT ..."))
@@ -55,12 +55,12 @@ try (CqlSession session = ...) {
 }
 ----
 
-==== Writing in reactive style
+=== Writing in reactive style
 
 The following example inserts rows into a table after printing the queries to the console, stopping at the first error, if any.
 Again, in case of error, a `DriverException` is thrown:
 
-[,java]
+[source,java]
 ----
 try (CqlSession session = ...) {
   Flux.just("INSERT ...", "INSERT ...", "INSERT ...", ...)
@@ -78,7 +78,7 @@ This is why the write example above uses a `flatMap` operator, which takes care 
 A common pitfall is to use an operator that silently ignores the returned `ReactiveResultSet`;
 for example, the code below seems correct, but will not execute any query:
 
-[,java]
+[source,java]
 ----
 // DON'T DO THIS
 Flux.just("INSERT INTO ...")
@@ -91,7 +91,7 @@ Since a write query does not return any rows, it may appear difficult to count t
 Hopefully most reactive libraries have operators that are useful in these scenarios.
 The following example demonstrates how to achieve this goal with Reactor:
 
-[,java]
+[source,java]
 ----
 Flux<Statement<?>> stmts = ...;
 long count =
@@ -108,11 +108,11 @@ long count =
 System.out.printf("Executed %d write statements%n", count);
 ----
 
-=== Accessing query metadata
+== Accessing query metadata
 
 `ReactiveResultSet` exposes useful information about request execution and query metadata:
 
-[,java]
+[source,java]
 ----
 Publisher<? extends ColumnDefinitions> getColumnDefinitions();
 Publisher<? extends ExecutionInfo> getExecutionInfos();
@@ -127,7 +127,7 @@ if the query fails, then these  publishers will fail with the same error.
 
 The following example executes a query, then prints all the available metadata to the console:
 
-[,java]
+[source,java]
 ----
 ReactiveResultSet rs = session.executeReactive("SELECT ...");
 // execute the query first
@@ -146,7 +146,7 @@ Each row returned by a  reactive query execution implements https://docs.datasta
 
 `ReactiveRow` exposes the same kind of query metadata and execution info found in  `ReactiveResultSet`, but for each individual row:
 
-[,java]
+[source,java]
 ----
 ColumnDefinitions getColumnDefinitions();
 ExecutionInfo getExecutionInfo();
@@ -157,7 +157,7 @@ Refer to the javadocs of https://docs.datastax.com/en/drivers/java/4.17/com/data
 
 The following example executes a query and, for each row returned, prints the coordinator that served that row, then retrieves all the coordinators that were contacted to fulfill the query and prints them to the console:
 
-[,java]
+[source,java]
 ----
 Iterable<Node> coordinators = Flux.from(session.executeReactive("SELECT ..."))
     .doOnNext(
@@ -174,9 +174,9 @@ Iterable<Node> coordinators = Flux.from(session.executeReactive("SELECT ..."))
 System.out.println("Contacted coordinators: " + coordinators);
 ----
 
-=== Advanced topics
+== Advanced topics
 
-==== Applying backpressure
+=== Applying backpressure
 
 One of the key features of reactive programming is backpressure.
 
@@ -197,7 +197,7 @@ It is strongly advised for users to limit the concurrency at which write stateme
 A simple way to achieve this is to use the `flatMap` operator, which, in most reactive libraries, has an overloaded form that takes a parameter that controls the desired amount of concurrency.
 The following example executes a flow of statements with a maximum concurrency of 10, leveraging the `concurrency` parameter of Reactor's `flatMap` operator:
 
-[,java]
+[source,java]
 ----
 Flux<Statement<?>> stmts = ...;
 stmts.flatMap(session::executeReactive, 10).blockLast();
@@ -212,7 +212,7 @@ Consult the documentation of your reactive library for more information.
 As a last resort, it is also possible to limit concurrency at driver level, for example using the driver's built-in link:../throttling/[request throttling] mechanism, although this is usually not required in reactive applications.
 See "https://docs.datastax.com/en/devapp/doc/devapp/driverManagingConcurrency.html][Managing concurrency in asynchronous query execution]" in the Developer Guide for a few examples.
 
-==== Caching query results
+=== Caching query results
 
 As stated above, a `ReactiveResultSet` can only be subscribed once.
 This is an intentional design decision, because otherwise users could inadvertently trigger a spurious execution of the same query again when subscribing for the second time to the same `ReactiveResultSet`.
@@ -220,7 +220,7 @@ This is an intentional design decision, because otherwise users could inadverten
 Let's suppose that we want to compute both the average and the sum of all values from a table column.
 The most naive approach would be to create two flows and subscribe to both:
 
-[,java]
+[source,java]
 ----
 // DON'T DO THIS
 ReactiveResultSet rs = session.executeReactive("SELECT n FROM ...");
@@ -239,7 +239,7 @@ Unfortunately, the second `Flux` above with terminate immediately with an `onErr
 
 To circumvent this limitation, while still avoiding to query the table twice, the easiest technique consists in using the `cache` operator that most reactive libraries offer:
 
-[,java]
+[source,java]
 ----
 Flux<Long> rs = Flux.from(session.executeReactive("SELECT n FROM ..."))
     .map(row -> row.getLong(0))
@@ -261,7 +261,7 @@ If caching is not an option, most reactive libraries also offer operators that m
 
 The above example could be rewritten with a different approach as follows:
 
-[,java]
+[source,java]
 ----
 Flux<Long> rs = Flux.from(session.executeReactive("SELECT n FROM ..."))
     .map(row -> row.getLong(0))
@@ -280,7 +280,7 @@ and the `autoConnect(2)` operator instructs `publish` to wait until it gets 2 su
 
 This approach should be the preferred one for large result sets since it does not involve caching results in memory.
 
-==== Resuming from and retrying after failed queries
+=== Resuming from and retrying after failed queries
 
 When executing a flow of statements, any failed query execution would trigger an `onError` signal and terminate the subscription immediately, potentially preventing subsequent queries from being executed at all.
 
@@ -291,7 +291,7 @@ Consult your reactive library documentation to find out which operators allow yo
 The following example executes a flow of statements;
 for each failed execution, the stack trace is printed to standard error and, thanks to the `onErrorResume` operator, the error is completely ignored and the flow execution resumes normally:
 
-[,java]
+[source,java]
 ----
 Flux<Statement<?>> stmts = ...;
 stmts.flatMap(
@@ -305,7 +305,7 @@ stmts.flatMap(
 The following example expands on the previous one: for each failed execution, at most 3 retries are attempted if the error was an ` UnavailableException`, then, if the query wasn't successful after retrying, a message is logged.
 Finally, all the errors are collected and the total number of failed queries is printed to the console:
 
-[,java]
+[source,java]
 ----
 Flux<Statement<?>> statements = ...;
 long failed = statements.flatMap(

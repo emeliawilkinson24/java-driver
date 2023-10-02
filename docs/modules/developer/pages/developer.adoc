@@ -1,4 +1,4 @@
-== Developer docs
+= Developer docs
 
 This section explains how driver internals work.
 The intended audience is:

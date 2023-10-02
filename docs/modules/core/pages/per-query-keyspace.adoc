@@ -1,6 +1,6 @@
-== Per-query keyspace
+= Per-query keyspace
 
-=== Quick overview
+== Quick overview
 
 Specify the keyspace separately instead of hardcoding it in the query string.
 
@@ -24,11 +24,11 @@ Exception in thread "main" java.lang.IllegalArgumentException: Can't use per-req
 _Note: at the time of writing, Cassandra 4 is not released yet.
 If you want to test those examples against the development version, keep in mind that native protocol v5 is still in beta, so you'll need to force it in the configuration: `datastax-java-driver.protocol.version = V5`_.
 
-=== Basic usage
+== Basic usage
 
 To use a per-query keyspace, set it on your statement instance:
 
-[,java]
+[source,java]
 ----
 CqlSession session = CqlSession.builder().build();
 CqlIdentifier keyspace = CqlIdentifier.fromCql("test");
@@ -41,7 +41,7 @@ You can do this on link:../simple/[simple], link:../prepared[prepared] or link:.
 
 If the session is connected to another keyspace, the per-query keyspace takes precedence:
 
-[,java]
+[source,java]
 ----
 CqlIdentifier keyspace1 = CqlIdentifier.fromCql("test1");
 CqlIdentifier keyspace2 = CqlIdentifier.fromCql("test2");
@@ -56,19 +56,19 @@ session.execute(statement);
 
 On the other hand, if a keyspace is hard-coded in the query, it takes precedence over the per-query keyspace:
 
-[,java]
+[source,java]
 ----
 // Will query test1.foo:
 SimpleStatement statement =
     SimpleStatement.newInstance("SELECT * FROM test1.foo WHERE k = 1").setKeyspace(keyspace2);
 ----
 
-=== Bound statements
+== Bound statements
 
 Bound statements can't have a per-query keyspace;
 they only inherit the one that was set on the prepared statement:
 
-[,java]
+[source,java]
 ----
 CqlIdentifier keyspace = CqlIdentifier.fromCql("test");
 PreparedStatement pst =
@@ -86,7 +86,7 @@ Therefore you'll have to prepare against every target keyspace.
 A good strategy is to do this lazily with a cache.
 Here is a simple example using Guava:
 
-[,java]
+[source,java]
 ----
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -107,7 +107,7 @@ CqlIdentifier keyspace = CqlIdentifier.fromCql("test");
 BoundStatement bs = cache.get(keyspace).bind(1);
 ----
 
-=== Relation to the routing keyspace
+== Relation to the routing keyspace
 
 Statements have another keyspace-related method: `Statement.setRoutingKeyspace()`.
 However, the routing keyspace is only used for https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/Request.html#getRoutingKey--[token-aware routing], as a hint to help the driver send requests to the best replica.
@@ -115,7 +115,7 @@ It does not affect the query string itself.
 
 If you are using a per-query keyspace, the routing keyspace becomes obsolete: the driver will use the per-query keyspace as the routing keyspace.
 
-[,java]
+[source,java]
 ----
 SimpleStatement statement =
     SimpleStatement.newInstance("SELECT * FROM foo WHERE k = 1")

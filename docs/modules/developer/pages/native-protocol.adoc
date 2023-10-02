@@ -1,4 +1,4 @@
-== Native protocol layer
+= Native protocol layer
 
 The native protocol layer encodes protocol messages into binary, before they are sent over the network.
 
@@ -21,15 +21,15 @@ The protocol message for a non-prepared request is `QUERY`;
 
 A similar process happens on the response path: decode the incoming binary payload into a protocol message, then convert the message into higher-level driver objects: `ResultSet`, `ExecutionInfo`, etc.
 
-=== Native protocol types
+== Native protocol types
 
-==== Messages
+=== Messages
 
 Every protocol message is identified by an opcode, and has a corresponding `Message` subclass.
 
 A `Frame` wraps a message to add metadata, such as the protocol version and stream id.
 
-[,ditaa]
+[source,dita]
 ----
 +-------+ contains +------------+
 | Frame +--------->+ Message    +
@@ -60,14 +60,14 @@ Data is often represented in the most simple way.
 For example, `ProtocolConstants` uses simple integer constants to represent protocol codes (enums wouldn't work at that level, because we need to add new codes in the DSE driver);
 the driver generally rewraps them in more type-safe structures before exposing them to higher-level layers.
 
-==== Encoding/decoding
+=== Encoding/decoding
 
 For every message, there is a corresponding `Message.Codec` for encoding and decoding.
 A `FrameCodec` relies on a set of message codecs, for one or more protocol versions.
 Given an incoming frame, it looks up the right message codec to use, based on the protocol version and opcode.
 Optionally, it compresses frame bodies with a `Compressor`.
 
-[,ditaa]
+[source,dita]
 ----
 +-----------------+                +-------------------+
 | FrameCodec[B]   +----------------+ PrimitiveCodec[B] |
@@ -90,7 +90,7 @@ Most of the time, you'll want to use the full set of message codecs for a given 
 The project provides default implementations for all supported protocol version, both for clients like the driver (e.g.
 encode `QUERY`, decode `RESULT`), or servers like Simulacron (decode `QUERY` encode `RESULT`).
 
-[,ditaa]
+[source,dita]
 ----
 +-------------+
 |  CodecGroup |
@@ -126,7 +126,7 @@ In the driver, this happens to be a Netty `ByteBuf`, but the encoding logic does
 This is expressed by the type parameter `B` in `FrameCodec<B>`.
 `PrimitiveCodec<B>` abstracts the basic primitives to work with a `B`: how to create an instance, read and write data to it, etc.
 
-[,java]
+[source,java]
 ----
 public interface PrimitiveCodec<B> {
   B allocate(int size);
@@ -145,7 +145,7 @@ In summary, to initialize a `FrameCodec`, you need:
 * a `Compressor` (optional);
 * one or more ``CodecGroup``s.
 
-=== Integration in the driver
+== Integration in the driver
 
 The driver initializes its `FrameCodec` in `DefaultDriverContext.buildFrameCodec()`.
 
@@ -153,7 +153,7 @@ The driver initializes its `FrameCodec` in `DefaultDriverContext.buildFrameCodec
 * the compressor comes from `DefaultDriverContext.buildCompressor()`, which determines the implementation from the configuration;
 * it is built with `FrameCodec.defaultClient`, which is a shortcut to use the default client groups: `ProtocolV3ClientCodecs`, `ProtocolV4ClientCodecs` and `ProtocolV5ClientCodecs`.
 
-=== Extension points
+== Extension points
 
 The default frame codec can be replaced by link:../common/context/#overriding-a-context-component[extending the context] to override `buildFrameCodec`.
 This can be used to add or remove a protocol version, or replace a particular codec.

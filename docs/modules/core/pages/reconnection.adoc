@@ -1,6 +1,6 @@
-== Reconnection
+= Reconnection
 
-=== Quick overview
+== Quick overview
 
 When a connection is lost, try to reestablish it at configured intervals.
 
@@ -11,7 +11,7 @@ defaults to exponential backoff, also available: constant delay, write your own.
 
 '''
 
-=== At runtime
+== At runtime
 
 If a running session loses a connection to a node, it tries to re-establish it according to a configurable policy.
 This is used in two places:
@@ -68,7 +68,7 @@ The connection succeeds, node4 is now the control node and the reconnection stop
 * [t = 3] node2's pool tries to open the last missing connection, which succeeds.
 The pool is back to its expected size, node2's reconnection stops.
 
-=== At init time
+== At init time
 
 If a session fails to connect when it is first created, the default behavior is to abort and throw an error immediately.
 

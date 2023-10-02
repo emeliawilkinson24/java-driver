@@ -1,11 +1,11 @@
-== Kotlin
+= Kotlin
 
 https://kotlinlang.org/[Kotlin] is an alternative language for the JVM.
 Its compact syntax and native support for annotation processing make it a good fit for the mapper.
 
 We have a full example at https://github.com/DataStax-Examples/object-mapper-jvm/tree/master/kotlin[DataStax-Examples/object-mapper-jvm/kotlin].
 
-=== Writing the model
+== Writing the model
 
 You can use Kotlin https://kotlinlang.org/docs/reference/data-classes.html[data classes] for your entities.
 Data classes are usually link:../../entities/#mutability[immutable], but you don't need to declare that explicitly with https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/mapper/annotations/PropertyStrategy.html[@PropertyStrategy]: the mapper detects that it's processing Kotlin code, and will assume `mutable = false` by default:
@@ -45,15 +45,15 @@ Known limitation: because of a Kotlin bug (https://youtrack.jetbrains.com/issue/
 They will appear as abstract methods to the mapper processor, which will generate an error since they are not properly annotated.
 As a workaround, you can use a companion object method that takes the DAO as an argument (as shown in https://github.com/DataStax-Examples/object-mapper-jvm/blob/master/kotlin/src/main/kotlin/com/datastax/examples/mapper/killrvideo/user/UserDao.kt[UserDao.kt]), or query provider methods.
 
-=== Building
+== Building
 
-==== Gradle
+=== Gradle
 
 See the example's https://github.com/DataStax-Examples/object-mapper-jvm/blob/master/kotlin/build.gradle[build.gradle].
 
 You enable Kotlin support with https://kotlinlang.org/docs/reference/using-gradle.html[kotlin] and https://kotlinlang.org/docs/reference/kapt.html#using-in-gradle[kotlin_kapt], and declare the mapper processor with the `kapt` directive.
 
-==== Maven
+=== Maven
 
 Configure https://kotlinlang.org/docs/reference/using-maven.html#compiling-kotlin-and-java-sources[dual compilation] of Kotlin and Java sources.
 In addition, you'll need an additional execution of the https://kotlinlang.org/docs/reference/kapt.html#using-in-maven[kotlin-maven-plugin:kapt] goal with the mapper processor before compilation:

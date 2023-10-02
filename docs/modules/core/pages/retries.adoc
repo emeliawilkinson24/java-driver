@@ -1,6 +1,6 @@
-== Retries
+= Retries
 
-=== Quick overview
+== Quick overview
 
 What to do when a request failed on a node: retry (same or other node), rethrow, or ignore.
 
@@ -15,7 +15,7 @@ you can also write your own.
 When a query fails, it sometimes makes sense to retry it: the error might be temporary, or the query might work on a different node.
 The driver uses a _retry policy_ to determine when and how to retry.
 
-=== Built-in retry policies
+== Built-in retry policies
 
 The driver ships with two retry policies: `DefaultRetryPolicy` ---- the default ----  and  `ConsistencyDowngradingRetryPolicy`.
 
@@ -43,7 +43,7 @@ datastax-java-driver.advanced.retry-policy.class = ConsistencyDowngradingRetryPo
 
 You can also use your own policy by specifying for the above option the fully-qualified name of a  class that implements https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/retry/RetryPolicy.html[RetryPolicy].
 
-=== Behavior
+== Behavior
 
 The behavior of both policies will be detailed in the sections below.
 
@@ -58,7 +58,7 @@ There are four possible retry decisions:
 * ignore the exception.
 That is, mark the request as successful, and return an empty result set.
 
-==== `onUnavailableVerdict`
+=== `onUnavailableVerdict`
 
 A request reached the coordinator, but there weren't enough live replicas to achieve the requested consistency level.
 The coordinator replied with an `UNAVAILABLE` error.
@@ -75,7 +75,7 @@ Note that if it is not possible to downgrade, this policy will rethrow the excep
 For example,  if the original consistency level was QUORUM, and 2 replicas were required to achieve a quorum, but  only one replica is alive, then the query will be retried with consistency ONE.
 If no replica was  alive however, there is no point in downgrading, and the policy will rethrow.
 
-==== `onReadTimeoutVerdict`
+=== `onReadTimeoutVerdict`
 
 A read request reached the coordinator, which initially believed that there were enough live replicas to process it.
 But one or several replicas were too slow to answer within the predefined timeout (`read_request_timeout_in_ms` in `cassandra.yaml`);
@@ -96,7 +96,7 @@ The reasoning is that by the time we get the timeout, the dead replica will like
 If not enough replicas responded however, it will attempt to downgrade the initial consistency  level, and retry _the same node_.
 If it is not possible to downgrade, this policy will rethrow the  exception.
 
-==== `onWriteTimeoutVerdict`
+=== `onWriteTimeoutVerdict`
 
 This is similar to `onReadTimeout`, but for write operations.
 The reason reads and writes are handled separately is because a read is obviously a non mutating operation, whereas a write is likely to be.
@@ -122,7 +122,7 @@ If  downgrading is not possible, the policy will rethrow.
 * For `BATCH_LOG` write type: the policy will retry the same node, for the reasons explained above.
 * For other write types: the policy will always rethrow.
 
-==== `onRequestAbortedVerdict`
+=== `onRequestAbortedVerdict`
 
 The request was aborted before we could get a response from the coordinator.
 This can happen in two cases:
@@ -136,7 +136,7 @@ Otherwise, the driver bypasses the retry policy and always rethrows the error.
 
 Both the default policy and `ConsistencyDowngradingRetryPolicy` retry on the next node if the  connection was closed, and rethrow (assuming a driver bug) in all other cases.
 
-==== `onErrorResponseVerdict`
+=== `onErrorResponseVerdict`
 
 The coordinator replied with an error other than `READ_TIMEOUT`, `WRITE_TIMEOUT` or `UNAVAILABLE`.
 Namely, this covers https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/servererrors/OverloadedException.html[OverloadedException], https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/servererrors/ServerError.html[ServerError], https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/servererrors/TruncateException.html[TruncateException], https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/servererrors/ReadFailureException.html[ReadFailureException] and https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/servererrors/WriteFailureException.html[WriteFailureException].
@@ -146,7 +146,7 @@ Otherwise, the driver bypasses the retry policy and always rethrows the error.
 
 Both the default policy and `ConsistencyDowngradingRetryPolicy` rethrow read and write failures,  and retry other errors on the next node.
 
-=== Hard-coded rules
+== Hard-coded rules
 
 There are a few cases where retrying is always the right thing to do.
 These are not covered by `RetryPolicy`, but instead hard-coded in the driver:
@@ -167,7 +167,7 @@ These include:
 * https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/servererrors/FunctionFailureException.html[FunctionFailureException];
 * https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/servererrors/ProtocolError.html[ProtocolError].
 
-=== Using multiple policies
+== Using multiple policies
 
 The retry policy can be overridden in link:../configuration/#profiles[execution profiles]:
 

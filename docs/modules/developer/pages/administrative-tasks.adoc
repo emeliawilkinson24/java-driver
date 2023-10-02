@@ -1,9 +1,9 @@
-== Administrative tasks
+= Administrative tasks
 
 Aside from the main task of link:../request_execution[executing user requests], the driver also needs to track cluster state and metadata.
 This is done with a number of administrative components:
 
-[,ditaa]
+[source,dita]
 ----
                                  +---------------+
                                  | DriverChannel |
@@ -32,7 +32,7 @@ node info|     |                  schema |         +------------+ EventBus |
 
 NOTE: the event bus is covered in the link:../common/event_bus[common infrastructure] section.
 
-=== Control connection
+== Control connection
 
 The goal of the control connection is to maintain a dedicated `DriverChannel` instance, used to:
 
@@ -48,7 +48,7 @@ It has its own reconnection mechanism (if the channel goes down, a new one will 
 
 Note that the control connection is really just an implementation detail of the metadata manager and topology monitor: if those components are overridden with custom versions that use other means to get their data, the driver will detect it and not initialize the control connection (at the time of writing, the session also references the control connection directly, but that's a bug: https://datastax-oss.atlassian.net/browse/JAVA-2473[JAVA-2473]).
 
-=== Metadata manager
+== Metadata manager
 
 This component is responsible for maintaining the contents of link:../../core/metadata/[session.getMetadata()].
 
@@ -74,7 +74,7 @@ The schema refresh process uses a few auxiliary components that may have differe
 When the metadata manager needs node-related data, it queries the topology monitor.
 When it needs schema-related data, it uses the control connection directly to issue its queries.
 
-=== Topology monitor
+== Topology monitor
 
 `TopologyMonitor` abstracts how we get information about nodes in the cluster:
 
@@ -85,7 +85,7 @@ When it needs schema-related data, it uses the control connection directly to is
 
 The built-in implementation uses the control connection to query `system.local` and `system.peers`, and listen to gossip events.
 
-=== Node state manager
+== Node state manager
 
 `NodeStateManager` tracks the state of the nodes in the cluster.
 
@@ -99,7 +99,7 @@ Instead, the driver uses more elaborate rules that combine external signals with
 
 See the javadocs of `NodeState` and `TopologyEvent`, as well as the `NodeStateManager` implementation itself, for more details.
 
-==== Topology events vs. node state events
+=== Topology events vs. node state events
 
 These two event types are related, but they're used at different stages:
 
@@ -113,14 +113,14 @@ In general, other driver components only react to node state events, but there a
 
 The best way to find where each event is used is to do a usage search of the event type.
 
-=== How admin components work together
+== How admin components work together
 
 Most changes to the cluster state will involve the coordinated effort of multiple admin components.
 Here are a few examples:
 
-==== A new node gets added
+=== A new node gets added
 
-[,ditaa]
+[source,dita]
 ----
 +-----------------+   +--------+ +----------------+ +---------------+ +---------------+
 |ControlConnection|   |EventBus| |NodeStateManager| |MetadataManager| |TopologyMonitor|
@@ -166,9 +166,9 @@ Here are a few examples:
 At this point, other driver components listening on the event bus will get notified of the addition.
 For example, `DefaultSession` will initialize a connection pool to the new node.
 
-==== A new table gets created
+=== A new table gets created
 
-[,ditaa]
+[source,dita]
 ----
   +-----------------+               +---------------+     +---------------+ +--------+
   |ControlConnection|               |MetadataManager|     |TopologyMonitor| |EventBus|
@@ -205,9 +205,9 @@ For example, `DefaultSession` will initialize a connection pool to the new node.
            |                                |                     |             |
 ----
 
-==== The last connection to an active node drops
+=== The last connection to an active node drops
 
-[,ditaa]
+[source,dita]
 ----
   +-----------+              +--------+   +----------------+     +----+ +---------------+
   |ChannelPool|              |EventBus|   |NodeStateManager|     |Node| |MetadataManager|
@@ -277,9 +277,9 @@ For example, `DefaultSession` will initialize a connection pool to the new node.
         |                        |                |                |            |
 ----
 
-=== Extension points
+== Extension points
 
-==== TopologyMonitor
+=== TopologyMonitor
 
 This is a standalone component because some users have asked for a way to use their own discovery service instead of relying on system tables and gossip (see https://datastax-oss.atlassian.net/browse/JAVA-1082[JAVA-1082]).
 
@@ -292,7 +292,7 @@ It should:
 Read the javadocs for more details;
 in particular, `NodeInfo` explains how the driver uses the information returned by the topology monitor.
 
-==== MetadataManager
+=== MetadataManager
 
 It's less likely that this will be overridden directly.
 But the schema querying and parsing logic is abstracted behind two factories that handle the differences between Cassandra versions: `SchemaQueriesFactory` and `SchemaParserFactory`.

@@ -1,6 +1,6 @@
-== Integration
+= Integration
 
-=== Builds tools
+== Builds tools
 
 The `java-driver-mapper-processor` artifact contains the annotation processor.
 It hooks into the Java compiler, and generates additional source files from your annotated classes before the main compilation happens.
@@ -9,7 +9,7 @@ It is only required in the compile classpath.
 The `java-driver-mapper-runtime` artifact contains the annotations and a few utility classes.
 It is a regular dependency, required at runtime.
 
-==== Maven
+=== Maven
 
 The best approach is to add the `annotationProcessorPaths` option to the compiler plugin's configuration (make sure you use version 3.5 or higher):
 
@@ -87,7 +87,7 @@ Most end in a special `__MapperGenerated` suffix, in order to clearly identify t
 
 Do not edit those files files directly: your changes would be overwritten during the next full rebuild.
 
-==== Gradle
+=== Gradle
 
 Use the following configuration (Gradle 4.6 and above):
 
@@ -105,7 +105,7 @@ dependencies {
 
 You will find the generated files in `build/generated/sources/annotationProcessor`.
 
-=== Integration with other languages and libraries
+== Integration with other languages and libraries
 
 * +++<a name="kotlin">++++++</a>+++link:kotlin/[Kotlin]
 * +++<a name="lombok">++++++</a>+++link:lombok/[Lombok]

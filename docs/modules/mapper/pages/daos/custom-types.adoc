@@ -1,4 +1,4 @@
-== Custom result types
+= Custom result types
 
 The mapper supports a pre-defined set of built-in types for DAO method results.
 For example, a link:../select/#return-type[Select] method can return a single entity, an asynchronous `CompletionStage`, a `ReactiveResultSet`, etc.
@@ -11,7 +11,7 @@ To achieve this, the mapper allows you to plug custom logic that will get invoke
 In the rest of this page, we'll show a simple example that replaces Java's `CompletableFuture` with Guava's `ListenableFuture`.
 Our goal is to have the mapper implement this interface:
 
-[,java]
+[source,java]
 ----
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -31,15 +31,15 @@ public interface ProductDao {
 }
 ----
 
-=== Writing the producers
+== Writing the producers
 
 The basic component that encapsulates conversion logic is https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/mapper/result/MapperResultProducer.html[MapperResultProducer].
 Our DAO has two different return types: `ListenableFuture<Void>` and `ListenableFuture<Product>`.
 So we're going to write two producers:
 
-==== Future of void
+=== Future of void
 
-[,java]
+[source,java]
 ----
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
 import com.google.common.util.concurrent.Futures;
@@ -95,9 +95,9 @@ Clients of asynchronous APIs generally   expect to deal with exceptions in futur
 Note that we specialized the return types of `execute()` and `wrapError()`, instead of using `Object` as declared by the parent interface.
 This is not strictly necessary (the calling code only knows the parent interface, so there _will_ be an unchecked cast), but it makes the code a bit nicer to read.
 
-==== Future of entity
+=== Future of entity
 
-[,java]
+[source,java]
 ----
 public class FutureOfEntityProducer implements MapperResultProducer {
   @Override
@@ -119,7 +119,7 @@ public class FutureOfEntityProducer implements MapperResultProducer {
                 result.setException(error);
               } else {
                 Row row = resultSet.one();
-                result.set((row == null) ? null : entityHelper.get(row));      // (2)
+                result.set((row = null) ? null : entityHelper.get(row));      // (2)
               }
             });
     return result;
@@ -140,13 +140,13 @@ This is a general-purpose utility   class used throughout the mapper, in this ca
 
 At most one entity class is allowed in the return type.
 
-==== Matching more complex types
+=== Matching more complex types
 
 The two examples above (exact match and matching the raw type) should cover the vast majority of needs.
 Occasionally you may encounter cases with deeper level of parameterization, such as `ListenableFuture<Optional<Product>>`.
 To match this you'll have to call `getType()` and switch to the `java.lang.reflect` world:
 
-[,java]
+[source,java]
 ----
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -157,7 +157,7 @@ public boolean canProduce(GenericType<?> genericType) {
     Type type = genericType.getType();
     if (type instanceof ParameterizedType) {
       Type[] arguments = ((ParameterizedType) type).getActualTypeArguments();
-      if (arguments.length == 1) {
+      if (arguments.length = 1) {
         Type argument = arguments[0];
         return argument instanceof ParameterizedType
             && ((ParameterizedType) argument).getRawType().equals(Optional.class);
@@ -168,11 +168,11 @@ public boolean canProduce(GenericType<?> genericType) {
 }
 ----
 
-=== Packaging the producers in a service
+== Packaging the producers in a service
 
 Once all the producers are ready, we package them in a class that implements https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/mapper/result/MapperResultProducerService.html[MapperResultProducerService]:
 
-[,java]
+[source,java]
 ----
 public class GuavaFutureProducerService implements MapperResultProducerService {
   @Override
@@ -195,7 +195,7 @@ some.package.name.GuavaFutureProducerService
 
 You can put the producers, service and service descriptor directly in your application, or distribute them as a standalone JAR if you intend to reuse them.
 
-=== Disabling custom types
+== Disabling custom types
 
 Custom types are handled at runtime.
 This goes a bit against the philosophy of the rest of the object mapper, where most of the work is done at compile time thanks to annotation processing.

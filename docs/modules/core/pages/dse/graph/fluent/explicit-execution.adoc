@@ -1,8 +1,8 @@
-== Explicit execution
+= Explicit execution
 
-Fluent traversals can be wrapped into a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/FluentGraphStatement.html[FluentGraphStatement] and passed to the session:
+Fluent traversals can be wrapped into a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/FluentGraphStatement.html[`FluentGraphStatement`] and passed to the session:
 
-[,java]
+[source,java]
 ----
 // A "dummy", non-connected traversal source that is not meant to be iterated directly, but instead
 // serves as the basis to build fluent statements:
@@ -17,16 +17,16 @@ for (GraphNode node : result) {
 }
 ----
 
-=== Creating fluent statements
+== Creating fluent statements
 
-==== Factory method
+=== Factory method
 
-As shown above, https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/FluentGraphStatement.html#newInstance-org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal-[FluentGraphStatement.newInstance] creates a statement from a traversal directly.
+As shown above, https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/FluentGraphStatement.html#newInstance-org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal-[`FluentGraphStatement.newInstance`] creates a statement from a traversal directly.
 
-The default implementation returned by the driver is *immutable*;
-if you call additional methods on the statement -- for example to set link:../../options/[options] -- each method call will create a new copy:
+The default implementation returned by the driver is *immutable*.
+If you call additional methods on the statement, for example, to set link:../../options/[options], each method called will create a new copy:
 
-[,java]
+[source,java]
 ----
 FluentGraphStatement statement = FluentGraphStatement.newInstance(traversal);
 FluentGraphStatement statement2 = statement.setTimeout(Duration.ofSeconds(10));
@@ -39,14 +39,17 @@ Immutability is good because it makes statements inherently *thread-safe*: you c
 On the other hand, it means a lot of intermediary copies if you often call methods on your statements.
 Modern VMs are normally good at dealing with such short-lived objects, but if you're worried about the performance impact, consider using a builder instead.
 
-NOTE: contrary to driver statements, Tinkerpop's `GraphTraversal` is mutable and therefore not thread-safe.
+[NOTE]
+====
+Contrary to driver statements, Tinkerpop's `GraphTraversal` is mutable and therefore not thread-safe.
 This is fine if you just wrap a traversal into a statement and never modify it afterwards, but be careful not to share traversals and modify them concurrently.
+====
 
-==== Builder
+=== Builder
 
 Instead of creating a statement directly, you can pass your traversal to https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/FluentGraphStatement.html#builder-org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal-[FluentGraphStatement.builder], chain method calls to set options, and finally call `build()`:
 
-[,java]
+[source,java]
 ----
 FluentGraphStatement statement1 =
     FluentGraphStatement.builder(traversal)
@@ -60,7 +63,7 @@ As a consequence, the builder object is *not thread-safe*.
 
 You can also initialize a builder from an existing statement: it will inherit all of its options.
 
-[,java]
+[source,java]
 ----
 FluentGraphStatement statement2 =
     FluentGraphStatement.builder(statement1).withTimeout(Duration.ofSeconds(20)).build();
@@ -70,12 +73,12 @@ assert statement2.getTimeout().equals(Duration.ofSeconds(20)); // overridden by 
 assert statement2.isIdempotent(); // because statement1 was
 ----
 
-=== Batching traversals
+== Batching traversals
 
-https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/BatchGraphStatement.html[BatchGraphStatement] allows you to execute multiple mutating traversals in the same transaction.
+https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/BatchGraphStatement.html[`BatchGraphStatement`] allows you to execute multiple mutating traversals in the same transaction.
 Like other types of statements, it is immutable and thread-safe, and can be created either with a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/BatchGraphStatement.html#newInstance--[factory method] or a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/graph/BatchGraphStatement.html#builder--[builder]:
 
-[,java]
+[source,java]
 ----
 GraphTraversal<Vertex, Vertex> traversal1 = g.addV("person").property("name", "batch1").property("age", 1);
 GraphTraversal<Vertex, Vertex> traversal2 = g.addV("person").property("name", "batch2").property("age", 2);
@@ -94,11 +97,10 @@ BatchGraphStatement batch2 = BatchGraphStatement.builder()
 
 Traversal batches are only available with DSE 6.0 or above.
 
-=== Prepared statements
+== Prepared statements
 
-At the time of writing (DSE 6.0), prepared graph statements are not supported yet;
-they will be added in a future version.
+At the time of writing (DSE 6.0), prepared graph statements are not supported yet.
 
 '''
 
-See also the link:../[parent page] for topics common to all fluent traversals.
+See also the xref:dse:graph/fluent/fluent-api.adoc[Fluent API] for topics common to all fluent traversals.

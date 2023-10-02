@@ -1,4 +1,4 @@
-== Control connection
+= Control connection
 
 The control connection is a dedicated connection used for administrative tasks:
 

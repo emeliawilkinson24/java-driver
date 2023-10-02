@@ -1,6 +1,6 @@
-== Query timestamps
+= Query timestamps
 
-=== Quick overview
+== Quick overview
 
 Defines the order in which mutations are applied on the server.
 Ways to set it (by order of precedence, higher priority first):
@@ -17,24 +17,24 @@ In Cassandra, each mutation has a microsecond-precision timestamp, which is used
 
 There are various ways to assign it:
 
-=== CQL `USING TIMESTAMP`
+== CQL `USING TIMESTAMP`
 
 You can explicitly provide the timestamp in your CQL query:
 
-[,java]
+[source,java]
 ----
 session.execute("INSERT INTO my_table(c1, c2) values (1, 1) " +
     "USING TIMESTAMP 1432815430948040");
 ----
 
-=== Timestamp generator
+== Timestamp generator
 
 The driver has a timestamp generator that gets invoked for every outgoing request;
 it either assigns a client-side timestamp to the request, or indicates that the server should assign it.
 
 The timestamp generator is defined in the link:../configuration/[configuration].
 
-==== AtomicTimestampGenerator
+=== AtomicTimestampGenerator
 
 ----
 datastax-java-driver.advanced.timestamp-generator {
@@ -88,7 +88,7 @@ To check what the driver is currently using, turn on `INFO` logs for the categor
 * `Could not access native clock (see debug logs for details), falling back to Java system clock`
 * `Using native clock for microsecond precision`
 
-==== ThreadLocalTimestampGenerator
+=== ThreadLocalTimestampGenerator
 
 ----
 datastax-java-driver.advanced.timestamp-generator {
@@ -105,7 +105,7 @@ This is a bit more efficient, but should only be used when threads are not in di
 It uses the same configuration options `drift-warning` and``force-java-clock``;
 see the previous section for details.
 
-==== ServerSideTimestampGenerator
+=== ServerSideTimestampGenerator
 
 ----
 datastax-java-driver.advanced.timestamp-generator {
@@ -115,11 +115,11 @@ datastax-java-driver.advanced.timestamp-generator {
 
 This implementation always lets the server assign a timestamp.
 
-==== Custom
+=== Custom
 
 You can create your own generator by implementing https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/time/TimestampGenerator.html[TimestampGenerator], and referencing your implementation class from the configuration.
 
-==== Using multiple generators
+=== Using multiple generators
 
 The timestamp generator can be overridden in link:../configuration/#profiles[execution profiles]:
 
@@ -142,11 +142,11 @@ Note that this goes beyond configuration inheritance: the driver only creates a 
 Each request uses its declared profile's generator.
 If it doesn't declare any profile, or if the profile doesn't have a dedicated policy, then the default profile's generator is used.
 
-=== Per-statement timestamp
+== Per-statement timestamp
 
 Finally, you can assign a timestamp to a statement directly from application code:
 
-[,java]
+[source,java]
 ----
 Statement statement =
     SimpleStatement.builder("UPDATE users SET email = 'x@y.com' where id = 1")
@@ -155,7 +155,7 @@ Statement statement =
 session.execute(statement);
 ----
 
-=== Timestamps and lightweight transactions
+== Timestamps and lightweight transactions
 
 Client-side timestamps are prohibited for https://docs.datastax.com/en/dse/6.0/cql/cql/cql_using/useInsertLWT.html[lightweight transactions] (used for conditional updates such as `+INSERT...
 IF NOT EXISTS+`, `+UPDATE...
@@ -170,7 +170,7 @@ InvalidRequest: Error from server: code=2200 [Invalid query] message="Cannot pro
 
 If you execute a conditional update through the driver with a client-side timestamp generator, the client-side timestamp will be silently ignored and the server will provide its own.
 
-=== Summary
+== Summary
 
 Here is the order of precedence of all the methods described so far:
 

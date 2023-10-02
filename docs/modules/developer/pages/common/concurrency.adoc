@@ -1,9 +1,9 @@
-== Concurrency
+= Concurrency
 
 The driver is a highly concurrent environment.
 We try to use thread confinement to simplify the code, when that does not impact performance.
 
-=== Hot path
+== Hot path
 
 The hot path is everything that happens for a `session.execute` call.
 In a typical client application, this is where the driver will likely spend the majority of its time, so it must be fast.
@@ -30,14 +30,14 @@ so you will find that the code is fairly similar to driver 3 in terms of concurr
 
 NOTE: code on the hot path should prefer the `TRACE` log level.
 
-=== Cold path
+== Cold path
 
 The cold path is everything else: initialization and shutdown, metadata refreshes, tracking node states, etc.
 They will typically be way less frequent than user requests, so we can tolerate a small performance hit in order to make concurrency easier to handle.
 
 One pattern we use a lot is a confined inner class:
 
-[,java]
+[source,java]
 ----
 public class ControlConnection {
   // some content omitted for brevity
@@ -68,7 +68,7 @@ If we need to propagate a result, the outer method injects a future that the inn
 
 Confining `SingleThreaded` simplifies the code tremendously: we can use regular, non-volatile fields, and methods are guaranteed to always run in isolation, eliminating subtle race conditions (this idea was borrowed from actor systems).
 
-=== Non-blocking
+== Non-blocking
 
 Whether on the hot or cold path, internal code is almost 100% lock-free.
 The driver guarantees on lock-freedom are link:../../../core/non_blocking[detailed] in the core manual.
@@ -78,7 +78,7 @@ Examples of this can be found in `ReprepareOnUp` and  `DefaultTopologyMonitor` (
 
 The only place where the driver blocks is when using the synchronous API (methods declared in  https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/SyncCqlSession.html`[`SyncCqlSession`]), and when calling other synchronous wrapper methods in the public API, for example, https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/ExecutionInfo.html#getQueryTrace--[`ExecutionInfo.getQueryTrace()`]:
 
-[,java]
+[source,java]
 ----
 public interface ExecutionInfo {
   // some content omitted for brevity

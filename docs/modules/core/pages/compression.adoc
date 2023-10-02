@@ -1,6 +1,6 @@
-== Compression
+= Compression
 
-=== Quick overview
+== Quick overview
 
 Compress request and response bodies to save bandwidth.
 
@@ -34,7 +34,7 @@ it offers fallback implementations in case native libraries fail to load and htt
 Both implementations rely on third-party libraries, declared by the driver as _optional_ dependencies;
 if you enable compression, you need to explicitly depend on the corresponding library to pull it into your project (see the link:../integration/#driver-dependencies[Integration>Driver dependencies] section for more details).
 
-=== LZ4
+== LZ4
 
 Dependency:
 
@@ -63,7 +63,7 @@ To find out which one was chosen, link:../logging/[enable INFO logs] on the cate
 INFO  com.datastax.oss.driver.internal.core.protocol.Lz4Compressor  - Using LZ4Factory:JNI
 ----
 
-=== Snappy
+== Snappy
 
 Dependency:
 

@@ -1,4 +1,4 @@
-== Query builder
+= Query builder
 
 The query builder is a utility to *generate CQL queries programmatically*.
 For example, it could be used to:
@@ -19,7 +19,7 @@ To use it in your application, add the following dependency:
 
 Here is our canonical example rewritten with the query builder:
 
-[,java]
+[source,java]
 ----
 import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.*;
 
@@ -34,14 +34,14 @@ try (CqlSession session = CqlSession.builder().build()) {
 }
 ----
 
-=== General concepts
+== General concepts
 
-==== Fluent API
+=== Fluent API
 
 All the starting methods are centralized in the https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/querybuilder/QueryBuilder.html[QueryBuilder] and https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/querybuilder/SchemaBuilder.html[SchemaBuilder] classes.
 To get started, add one of the following imports:
 
-[,java]
+[source,java]
 ----
 // For DML queries, such as SELECT
 import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.*;
@@ -53,7 +53,7 @@ import static com.datastax.oss.driver.api.querybuilder.SchemaBuilder.*;
 Choose the method matching your desired statement, for example `selectFrom`.
 Then use your IDE's completion and the javadocs to add query parts:
 
-[,java]
+[source,java]
 ----
 Select select =
     selectFrom("ks", "user")
@@ -65,14 +65,14 @@ Select select =
 
 When your query is complete, you can either extract a raw query string, or turn it into a link:../core/statements/simple[simple statement] (or its builder):
 
-[,java]
+[source,java]
 ----
 String cql = select.asCql();
 SimpleStatement statement = select.build();
 SimpleStatementBuilder builder = select.builder();
 ----
 
-==== DataStax Enterprise
+=== DataStax Enterprise
 
 The driver provides two additional entry points for DSE-specific queries: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/querybuilder/DseQueryBuilder.html[DseQueryBuilder] and https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/querybuilder/DseSchemaBuilder.html[DseSchemaBuilder].
 They extend their respective non-DSE counterparts, so anything that is available on the default query builder can also be done with the DSE query builder.
@@ -82,7 +82,7 @@ they will be enriched in the future if DSE adds custom CQL syntax.
 
 Currently, the only difference is the support for the `DETERMINISTIC` and `MONOTONIC` keywords when generating `CREATE FUNCTION` or `CREATE AGGREGATE` statements:
 
-[,java]
+[source,java]
 ----
 import static com.datastax.dse.driver.api.querybuilder.DseSchemaBuilder.createDseFunction;
 
@@ -95,12 +95,12 @@ createDseFunction("func1")
 // CREATE FUNCTION func1 (param1 int) RETURNS NULL ON NULL INPUT RETURNS int DETERMINISTIC MONOTONIC
 ----
 
-==== Immutability
+=== Immutability
 
 All types in the fluent API are immutable.
 This means that every step creates a new object:
 
-[,java]
+[source,java]
 ----
 SelectFrom selectFrom = selectFrom("ks", "user");
 
@@ -121,7 +121,7 @@ Modern garbage collectors are good at handling that, but still we recommend that
 * favor link:../core/statements/prepared[bound statements] for queries that are used often.
 You can still use the query builder and prepare the result:
 +
-[,java]
+[source,java]
 ----
 // During application initialization:
 Select selectUser = selectFrom("user").all().whereColumn("id").isEqualTo(bindMarker());
@@ -135,18 +135,18 @@ session.execute(preparedSelectUser.bind(userId));
 * for queries that never change, build them when your application initializes, and store them in a field or constant for later.
 * for queries that are built dynamically, consider using a cache.
 
-==== Identifiers
+=== Identifiers
 
 All fluent API methods use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/CqlIdentifier.html[CqlIdentifier] for schema element names (keyspaces, tables, columns...).
 But, for convenience, there are also `String` overloads that take the CQL form (as see link:../case_sensitivity[Case sensitivity] for more explanations).
 
 For conciseness, we'll use the string-based versions for the examples in this manual.
 
-=== Non-goals
+== Non-goals
 
 The query builder is *NOT*:
 
-==== A crutch to learn CQL
+=== A crutch to learn CQL
 
 While the fluent API guides you, it does not encode every rule of the CQL grammar.
 Also, it supports a wide range of Cassandra versions, some of which may be more recent than your production target, or not even released yet.
@@ -154,12 +154,12 @@ It's still possible to generate invalid CQL syntax if you don't know what you're
 
 You should always start with a clear idea of the CQL query, and write the builder code that produces it, not the other way around.
 
-==== A better way to write static queries
+=== A better way to write static queries
 
 The primary use case of the query builder is dynamic generation.
 You will get the most value out of it when you do things like:
 
-[,java]
+[source,java]
 ----
 // The columns to select are only known at runtime:
 for (String columnName : columnNames) {
@@ -174,7 +174,7 @@ if (name != null) {
 
 If all of your queries could also be written as compile-time string constants, ask yourself what the query builder is really buying you:
 
-[,java]
+[source,java]
 ----
 // Built version:
 private static final Statement SELECT_USERS =
@@ -193,7 +193,7 @@ The built version:
 
 It eventually boils down to personal taste, but for simple cases you should consider raw strings as a better alternative.
 
-=== Building queries
+== Building queries
 
 For a complete tour of the API, browse the child pages in this manual:
 

@@ -1,6 +1,6 @@
-== Case sensitivity
+= Case sensitivity
 
-=== In Cassandra
+== In Cassandra
 
 Cassandra identifiers, such as keyspace, table and column names, are case-insensitive by default.
 For example, if you create the following table:
@@ -54,7 +54,7 @@ cqlsh> SELECT * FROM test."FOOBAR";
 InvalidRequest: Error from server: code=2200 [Invalid query] message="table FOOBAR does not exist"
 ----
 
-=== In the driver
+== In the driver
 
 When we deal with identifiers, we use the following definitions:
 
@@ -71,7 +71,7 @@ This led a lot of internal complexity, and recurring bugs.
 To address this issue, driver 4+ uses a wrapper: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/CqlIdentifier.html[CqlIdentifier].
 Its API methods are always explicit about the form:
 
-[,java]
+[source,java]
 ----
 CqlIdentifier caseInsensitiveId = CqlIdentifier.fromCql("FooBar");
 System.out.println(caseInsensitiveId.asInternal());             // foobar
@@ -102,7 +102,7 @@ For "consuming" methods, string overloads are also provided for convenience, for
 * getters and setters of "data container" types https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/Row.html[Row], https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/data/UdtValue.html[UdtValue], and https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/BoundStatement.html[BoundStatement] follow special rules described https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/data/AccessibleByName.html[here] (these methods are treated apart because they are generally invoked very often, and therefore avoid to create `CqlIdentifier` instances internally);
 * in other cases, the string is always assumed to be in CQL form, and converted on the fly with `CqlIdentifier.fromCql`.
 
-=== Good practices
+== Good practices
 
 As should be clear by now, case sensitivity introduces a lot of extra (and arguably unnecessary) complexity.
 

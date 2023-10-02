@@ -1,11 +1,11 @@
-== Scala
+= Scala
 
 https://www.scala-lang.org/[Scala] is an alternative language for the JVM.
 It doesn't support annotation processing natively, so using it with the mapper is a bit more complicated, but it can be done.
 
 We have a full example at https://github.com/DataStax-Examples/object-mapper-jvm/tree/master/scala[DataStax-Examples/object-mapper-jvm/scala].
 
-=== Writing the model
+== Writing the model
 
 You can use Scala case classes for your entities.
 Notice the peculiar syntax for field annotations:
@@ -33,7 +33,7 @@ trait UserDao {
 }
 ----
 
-=== Building
+== Building
 
 Since Scala does not support annotation processing, the mapper processor cannot operate on Scala sources directly.
 But it can process the compiled class files output by the Scala compiler.

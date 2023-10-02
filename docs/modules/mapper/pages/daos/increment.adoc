@@ -1,8 +1,8 @@
-== Increment methods
+= Increment methods
 
 Annotate a DAO method with https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/mapper/annotations/Increment.html[@Increment] to generate a query that updates a counter table that is mapped to an entity:
 
-[,java]
+[source,java]
 ----
 // CREATE TABLE votes(article_id int PRIMARY KEY, up_votes counter, down_votes counter);
 
@@ -27,7 +27,7 @@ public interface VotesDao {
 }
 ----
 
-=== Parameters
+== Parameters
 
 The entity class must be specified with `entityClass` in the annotation.
 
@@ -42,7 +42,7 @@ The name of the parameter must match the name of the entity property that maps t
 Alternatively, you may annotate a parameter with https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/mapper/annotations/CqlName.html[@CqlName] to specify the raw column name directly;
 in that case, the name of the parameter does not matter:
 
-[,java]
+[source,java]
 ----
 @Increment(entityClass = Votes.class)
 void incrementUpVotes(int articleId, @CqlName("up_votes") long foobar);
@@ -59,11 +59,11 @@ It will be applied to the statement before execution.
 This allows you to customize certain aspects of the request (page size, timeout, etc) at runtime.
 See link:../statement_attributes/[statement attributes].
 
-=== Return type
+== Return type
 
 The method can return `void`, a void https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletionStage.html[CompletionStage] or https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html[CompletableFuture], or a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/cql/reactive/ReactiveResultSet.html[ReactiveResultSet].
 
-=== Target keyspace and table
+== Target keyspace and table
 
 If a keyspace was specified link:../../mapper/#dao-factory-methods[when creating the DAO], then the generated query targets that keyspace.
 Otherwise, it doesn't specify a keyspace, and will only work if the mapper was built from a session that has a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#withKeyspace-com.datastax.oss.driver.api.core.CqlIdentifier-[default keyspace] set.

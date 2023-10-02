@@ -1,6 +1,6 @@
-== GraalVM native images
+= GraalVM native images
 
-=== Quick overview
+== Quick overview
 
 * https://www.graalvm.org/reference-manual/native-image/[GraalVM native images] can be built with  no additional configuration starting with driver 4.13.0.
 * But extra configurations are required in a few cases:
@@ -15,11 +15,11 @@
 
 '''
 
-=== Concepts
+== Concepts
 
 Starting with version 4.13.0, the driver ships with https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/#embedding-a-configuration-file[embedded GraalVM configuration files] that  allow GraalVM native images including the driver to be built without hassle, barring a few  exceptions and caveats listed below.
 
-=== Classes instantiated by reflection
+== Classes instantiated by reflection
 
 The driver instantiates its components by reflection.
 The actual classes that will be instantiated  in this way need to be registered for reflection.
@@ -30,7 +30,7 @@ But if you intend to use a custom implementation in lieu of a driver built-in cl
 
 For example, assuming that you have the following load balancing policy implementation:
 
-[,java]
+[source,java]
 ----
 
 package com.example.app;
@@ -53,7 +53,7 @@ public class CustomLoadBalancingPolicy extends DefaultLoadBalancingPolicy {
 
 And assuming that you declared the above class in your application.conf file as follows:
 
-[,hocon]
+[source,hocon]
 ----
 datastax-java-driver.basic{
   load-balancing-policy.class = com.example.app.CustomLoadBalancingPolicy
@@ -76,7 +76,7 @@ Then you will have to register that class for reflection:
 NOTE: some frameworks allow you to simplify the registration process.
 For example, Quarkus offers the `io.quarkus.runtime.annotations.RegisterForReflection` annotation that you can use to annotate your class:
 
-[,java]
+[source,java]
 ----
 @RegisterForReflection
 public class CustomLoadBalancingPolicy extends DefaultLoadBalancingPolicy {
@@ -86,14 +86,14 @@ public class CustomLoadBalancingPolicy extends DefaultLoadBalancingPolicy {
 
 In this case, no other manual configuration is required for the above class to be correctly  registered for reflection.
 
-=== Configuration resources
+== Configuration resources
 
 The default driver link:../configuration[configuration] mechanism is based on the TypeSafe Config library.
 TypeSafe Config looks for a few classpath resources when initializing the configuration:  `reference.conf`, `application.conf`, `application.json`, `application.properties`.
 _These classpath  resources are all automatically included in the native image: you should not need to do it  manually_.
 See https://www.graalvm.org/reference-manual/native-image/Resources/[Accessing Resources in Native Images] for more information on how classpath  resources are handled in native images.
 
-=== Configuring the logging backend
+== Configuring the logging backend
 
 When configuring link:../logging[logging], the choice of a backend must be considered carefully, as  most logging backends resort to reflection during their configuration phase.
 
@@ -102,7 +102,7 @@ See  https://www.graalvm.org/reference-manual/native-image/Logging/[this page] f
 
 For other logging backends, please refer to the logging library documentation to find out if GraalVM  native images are supported.
 
-=== Using reactive-style programming
+== Using reactive-style programming
 
 The link:../reactive[reactive execution model] is compatible with GraalVM native images, but the following configurations must be added:
 
@@ -117,7 +117,7 @@ The link:../reactive[reactive execution model] is compatible with GraalVM native
 
 . When invoking the native image builder, add a `-H:ReflectionConfigurationFiles=reflection.json` flag and point it to the file created above.
 
-=== Using the Jackson JSON library
+== Using the Jackson JSON library
 
 https://github.com/FasterXML/jackson[Jackson] is used in link:../integration#jackson[a few places] in  the driver, but is an optional dependency;
 if you intend to use Jackson, the following  configurations must be added:
@@ -144,7 +144,7 @@ IMPORTANT: when using the shaded jar -- which is not officially supported on Gra
 
 . When invoking the native image builder, add a `-H:ReflectionConfigurationFiles=reflection.json` flag and point it to the file created above.
 
-=== Enabling compression
+== Enabling compression
 
 When using link:../compression/[compression], only LZ4 can be enabled in native images.
 *Snappy compression is not supported.*
@@ -207,15 +207,15 @@ In order for LZ4 compression to work in a native image, the following additional
 
 . When invoking the native image builder, add a `-H:ReflectionConfigurationFiles=reflection.json` flag and point it to the file created above.
 
-=== Native calls
+== Native calls
 
 The driver performs a few link:../integration#native-libraries[native calls] using  https://github.com/jnr[JNR].
 
 Starting with driver 4.7.0, native calls are also possible in a GraalVM native image, without any extra configuration.
 
-=== Using DataStax Enterprise (DSE) features
+== Using DataStax Enterprise (DSE) features
 
-==== DSE Geospatial types
+=== DSE Geospatial types
 
 DSE link:../dse/geotypes[Geospatial types] are supported on GraalVM native images;
 the following configurations must be added:
@@ -240,7 +240,7 @@ IMPORTANT: when using the shaded jar -- which is not officially supported on Gra
 
 . When invoking the native image builder, add a `-H:ReflectionConfigurationFiles=reflection.json` flag and point it to the file created above.
 
-==== DSE Graph
+=== DSE Graph
 
 *link:../dse/graph[DSE Graph] is not officially supported on GraalVM native images.*
 
@@ -290,7 +290,7 @@ If the native image build fails, a good option is to use GraalVM's https://www.g
 --initialize-at-build-time=org.apache.tinkerpop.shaded.jackson.databind.deser.std.StdDeserializer
 ----
 
-=== Using the shaded jar
+== Using the shaded jar
 
 *The link:../shaded_jar[shaded jar] is not officially supported in a GraalVM native image.*
 

@@ -1,6 +1,6 @@
-== Paging
+= Paging
 
-=== Quick overview
+== Quick overview
 
 How the server splits large result sets into multiple network responses.
 
@@ -15,7 +15,7 @@ How the server splits large result sets into multiple network responses.
 When a query returns many rows, it would be inefficient to return them as a single response message.
 Instead, the driver breaks the results into _pages_ which get returned as they are needed.
 
-=== Setting the page size
+== Setting the page size
 
 The page size specifies how many rows the server will return in each network frame.
 You can set it in the configuration:
@@ -30,13 +30,13 @@ If you have categories of queries that require different page sizes, use link:..
 Note that the page size is merely a hint;
 the server will not always return the exact number of rows, it might decide to return slightly more or less.
 
-=== Synchronous paging
+== Synchronous paging
 
 The fetch size limits the number of results that are returned in one page;
 if you iterate past that, the driver uses background queries to fetch subsequent pages.
 Here's an example with a fetch size of 20:
 
-[,java]
+[source,java]
 ----
 ResultSet rs = session.execute("SELECT * FROM my_table WHERE k = 1");
 for (Row row : rs) {
@@ -44,7 +44,7 @@ for (Row row : rs) {
 }
 ----
 
-[,ditaa]
+[source,dita]
 ----
     client         Session                          Cassandra
     --+--------------+---------------------------------+-----
@@ -75,7 +75,8 @@ for (Row row : rs) {
       |<------------------------ |                     |
 ----
 
-=== Asynchronous paging
+[[asynchronous-paging]]
+== Asynchronous paging
 
 In previous versions of the driver, the synchronous and asynchronous APIs returned the same `ResultSet` type.
 This made asynchronous paging very tricky, because it was very easy to accidentally trigger background synchronous queries (which would defeat the whole purpose of async, and potentially introduce deadlocks).
@@ -85,7 +86,7 @@ iteration only yields the current page, and the next page must be fetched explic
 To iterate a result set in a fully asynchronous manner, you need to compose page futures using the methods of https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletionStage.html[CompletionStage].
 Here's an example that prints each row on the command line:
 
-[,java]
+[source,java]
 ----
 CompletionStage<AsyncResultSet> resultSetFuture =
     session.executeAsync("SELECT * FROM myTable WHERE id = 1");
@@ -107,7 +108,7 @@ private CompletionStage<Void> printRows(AsyncResultSet resultSet) {
 If you need to propagate state throughout the iteration, add parameters to the callback.
 Here's an example that counts the number of rows (obviously this is contrived, you would use `SELECT COUNT(*)` instead of doing this client-side, but it illustrates the basic principle):
 
-[,java]
+[source,java]
 ----
 CompletionStage<AsyncResultSet> resultSetFuture =
     session.executeAsync("SELECT * FROM myTable WHERE id = 1");
@@ -129,7 +130,7 @@ private CompletionStage<Integer> countRows(AsyncResultSet resultSet, int previou
 
 See link:../async/[Asynchronous programming] for more tips about the async API.
 
-=== Saving and reusing the paging state
+== Saving and reusing the paging state
 
 Sometimes it is convenient to interrupt paging and resume it later.
 For example, this could be used for a stateless web service that displays a list of results with a link to the next page.
@@ -137,7 +138,7 @@ When the user clicks that link, we want to run the exact same query, except that
 
 The driver exposes a _paging state_ for that:
 
-[,java]
+[source,java]
 ----
 ResultSet rs = session.execute("your query");
 ByteBuffer pagingState = rs.getExecutionInfo().getPagingState();
@@ -163,7 +164,7 @@ If you try to modify its contents or reuse it with a different statement, the re
 
 If you want additional safety, the driver also provides a "safe" wrapper around the raw value: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/PagingState.html[PagingState].
 
-[,java]
+[source,java]
 ----
 PagingState pagingState = rs.getExecutionInfo().getSafePagingState();
 ----
@@ -173,7 +174,7 @@ This allows you to detect the error early, without a roundtrip to the server.
 
 Note that, if you use a simple statement and one of the bound values requires a link:../custom_codecs[custom codec], you have to provide a reference to the session when reinjecting the paging state:
 
-[,java]
+[source,java]
 ----
 CustomType value = ...
 SimpleStatement statement = SimpleStatement.newInstance("query", value);
@@ -184,7 +185,7 @@ statement = statement.setPagingState(pagingState, session);
 This is a small corner case because checking the state requires encoding the values, and a simple statement doesn't have a reference to the codec registry.
 If you don't use custom codecs, or if the statement is a bound statement, you can use the regular `setPagingState(pagingState)`.
 
-=== Offset queries
+== Offset queries
 
 Saving the paging state works well when you only let the user move from one page to the next.
 But in most Web UIs and REST services, you need paginated results with random access, for example: "given a page size of 20 elements, fetch page 5".
@@ -194,14 +195,14 @@ Cassandra does not support this natively (see https://issues.apache.org/jira/bro
 However, random pagination is a real need for many applications, and linear performance can be a reasonable trade-off if the cardinality stays low.
 The driver provides a utility to emulate offset queries on the client side: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/paging/OffsetPager.html[OffsetPager].
 
-==== Performance considerations
+=== Performance considerations
 
 For each page that you want to retrieve:
 
 * you need to re-execute the query, in order to start with a fresh result set;
 * you then pass the result to `OffsetPager`, which starts iterating from the beginning, and skips rows until it reaches the desired offset.
 
-[,java]
+[source,java]
 ----
 String query = "SELECT ...";
 OffsetPager pager = new OffsetPager(20);
@@ -217,12 +218,12 @@ OffsetPager.Page<Row> page5 = pager.getPage(rs, 5);
 
 Note that `getPage` can also process the entity iterables returned by the link:../../mapper/[mapper].
 
-==== Establishing application-level guardrails
+=== Establishing application-level guardrails
 
 Linear performance should be fine for the values typically encountered in real-world applications: for example, if the page size is 25 and users never go past page 10, the worst case is only 250 rows, which is a very small result set.
 However, we strongly recommend that you implement hard limits in your application code: if the page number is exposed to the user (for example if it is passed as a URL parameter), make sure it is properly validated and enforce a maximum, so that an attacker can't inject a large value that could potentially fetch millions of rows.
 
-==== Relation with protocol-level paging
+=== Relation with protocol-level paging
 
 Offset paging has no direct relation to `basic.request.page-size`.
 Protocol-level paging happens under the hood, and is completely transparent for offset paging: `OffsetPager` will work the same no matter how many network roundtrips were needed to fetch the result.

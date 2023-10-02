@@ -1,6 +1,6 @@
-== Token metadata
+= Token metadata
 
-=== Quick overview
+== Quick overview
 
 https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/Metadata.html#getTokenMap--[session.getMetadata().getTokenMap()]
 
@@ -14,10 +14,10 @@ https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/
 It is used internally by the driver to send requests to the optimal coordinator when token-aware routing is enabled.
 Another typical use case is data analytics clients, for example fetching a large range of keys in parallel by sending sub-queries to each replica.
 
-Because token metadata can be disabled, the resulting https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/TokenMap.html[TokenMap] object is wrapped in an `Optional`;
-to access it, you can use either a functional pattern, or more traditionally test first with `isPresent` and then unwrap:
+Because token metadata can be disabled, the resulting https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/TokenMap.html[TokenMap] object is wrapped in an `Optional`.
+To access it, you can use either a functional pattern, or more traditionally test first with `isPresent` and then unwrap:
 
-[,java]
+[source,java]
 ----
 Metadata metadata = session.getMetadata();
 
@@ -31,11 +31,11 @@ if (metadata.getTokenMap().isPresent()) {
 }
 ----
 
-=== `TokenMap` methods
+== `TokenMap` methods
 
 For illustration purposes, let's consider a fictitious ring with 6 tokens, and a cluster of 3 nodes that each own two tokens:
 
-[,ditaa]
+[source,dita]
 ----
              node1
              /---\
@@ -59,7 +59,7 @@ node2 | 8 |         | 4 | node3
 
 The first thing you can do is retrieve all the ranges, in other words describe the ring:
 
-[,java]
+[source,java]
 ----
 Set<TokenRange> ring = tokenMap.getTokenRanges();
 // Returns [Murmur3TokenRange(Murmur3Token(12), Murmur3Token(2)),
@@ -70,13 +70,16 @@ Set<TokenRange> ring = tokenMap.getTokenRanges();
 //          Murmur3TokenRange(Murmur3Token(10), Murmur3Token(12))]
 ----
 
-NOTE: `Murmur3Token` is an implementation detail.
+[NOTE]
+====
+`Murmur3Token` is an implementation detail.
 The actual class depends on the partitioner you configured in Cassandra, but in general you don't need to worry about that.
 `TokenMap` provides a few utility methods to parse tokens and create new instances: `parse`, `format`, `newToken` and `newTokenRange`.
+====
 
 You can also retrieve the ranges and tokens owned by a specific replica:
 
-[,java]
+[source,java]
 ----
 tokenMap.getTokenRanges(node1);
 // [Murmur3TokenRange(Murmur3Token(10), Murmur3Token(12)),
@@ -92,6 +95,7 @@ this is because ranges are start-exclusive and end-inclusive: `]10, 12]` and `]4
 Next, you can retrieve keyspace-specific information.
 To illustrate this, let's use two keyspaces with different replication settings:
 
+[source,no-highlight]
 ----
 // RF = 1: each range is only stored on the primary replica
 CREATE KEYSPACE ks1 WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
@@ -102,7 +106,7 @@ CREATE KEYSPACE ks2 WITH replication = {'class': 'SimpleStrategy', 'replication_
 
 `getReplicas` finds the nodes that have the data in a given range:
 
-[,java]
+[source,java]
 ----
 TokenRange firstRange = tokenMap.getTokenRanges().iterator().next();
 // Murmur3TokenRange(Murmur3Token(12), Murmur3Token(2))
@@ -114,10 +118,10 @@ Set<Node> nodes2 = tokenMap.getReplicas(CqlIdentifier.fromCql("ks2"), firstRange
 // [node2, node3] (the primary replica, and the next node on the ring)
 ----
 
-There is a also a variant that takes a primary key, to find the replicas for a particular row.
+There is a also a variant that takes a primary key to find the replicas for a particular row.
 In the following example, let's assume that the key hashes to the token "1" with the current partitioner:
 
-[,java]
+[source,java]
 ----
 String pk = "johndoe@example.com";
 // You need to manually encode the key as binary:
@@ -133,7 +137,7 @@ Set<Node> nodes2 = tokenMap.getReplicas(CqlIdentifier.fromCql("ks2"), encodedPk)
 
 Finally, you can go the other way, and find the token ranges that a node stores for a given keyspace:
 
-[,java]
+[source,java]
 ----
 Set<TokenRange> ranges1 = tokenMap.getTokenRanges(CqlIdentifier.fromCql("ks1"), node1);
 // [Murmur3TokenRange(Murmur3Token(4), Murmur3Token(6)),
@@ -148,12 +152,13 @@ Set<TokenRange> ranges2 = tokenMap.getTokenRanges(CqlIdentifier.fromCql("ks2"), 
 // (its primary ranges, and a replica of the primary ranges of node3, the previous node on the ring)
 ----
 
-=== Configuration
+== Configuration
 
-==== Enabling/disabling
+=== Enabling/disabling
 
 You can disable token metadata globally from the configuration:
 
+[source,hocon]
 ----
 datastax-java-driver.advanced.metadata.token-map.enabled = false
 ----
@@ -161,7 +166,7 @@ datastax-java-driver.advanced.metadata.token-map.enabled = false
 If it is disabled at startup, https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/Metadata.html#getTokenMap--[Metadata#getTokenMap] will stay empty, and token-aware routing won't work (requests will be sent to a non-optimal coordinator).
 If you disable it at runtime, it will keep the value of the last refresh, and token-aware routing might operate on stale data.
 
-==== Relation to schema metadata
+=== Relation to schema metadata
 
-The keyspace-specific information in `TokenMap` (all methods with a `CqlIdentifier` argument) relies on link:../schema/[schema metadata].
+The keyspace-specific information in `TokenMap` (all methods with a `CqlIdentifier` argument) relies on xref:core:metadata/schema.adoc[schema metadata].
 If schema metadata is disabled or filtered, token metadata will also be unavailable for the excluded keyspaces.

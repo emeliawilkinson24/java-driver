@@ -1,8 +1,8 @@
-== Query methods
+= Query methods
 
 Annotate a DAO method with https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/mapper/annotations/Query.html[@Query] to provide your own query string:
 
-[,java]
+[source,java]
 ----
 @Dao
 public interface SensorReadingDao {
@@ -13,12 +13,12 @@ public interface SensorReadingDao {
 
 This is the equivalent of what was called "accessor methods" in the driver 3 mapper.
 
-=== Parameters
+== Parameters
 
 The query string will typically contain CQL placeholders.
 The method's parameters must match those placeholders: same name and a compatible Java type.
 
-[,java]
+[source,java]
 ----
 @Query("SELECT count(*) FROM sensor_readings WHERE id = :id AND year = :year")
 long countByIdAndYear(int id, int year);
@@ -31,7 +31,7 @@ It will be applied to the statement before execution.
 This allows you to customize certain aspects of the request (page size, timeout, etc) at runtime.
 See link:../statement_attributes/[statement attributes].
 
-=== Return type
+== Return type
 
 The method can return:
 
@@ -63,14 +63,14 @@ Note that for result sets and iterables, you need to switch to the asynchronous 
 * a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/core/cql/reactive/ReactiveResultSet.html[ReactiveResultSet], or a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/dse/driver/api/mapper/reactive/MappedReactiveResultSet.html[MappedReactiveResultSet] of the entity class.
 * a link:../custom_types[custom type].
 
-=== Target keyspace and table
+== Target keyspace and table
 
 To avoid hard-coding the keyspace and table name, the query string supports 3 additional placeholders: `+${keyspaceId}+`, `+${tableId}+` and `+${qualifiedTableId}+`.
 They get substituted at DAO initialization time, with the link:../../mapper/#dao-factory-methods[keyspace and table that the DAO was built with].
 
 For example, given the following:
 
-[,java]
+[source,java]
 ----
 @Dao
 public interface TestDao {
