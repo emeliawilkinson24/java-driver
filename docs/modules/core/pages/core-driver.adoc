@@ -3,7 +3,7 @@
 The core module handles cluster connectivity and request execution.
 It is published under the following coordinates:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -232,6 +232,7 @@ String firstName = row.getString("first_name");
 
 See https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/data/AccessibleByName.html[AccessibleByName] for an explanation of the conversion rules.
 
+[[cql-to-java-type-mapping]]
 ==== CQL to Java type mapping
 
 |===

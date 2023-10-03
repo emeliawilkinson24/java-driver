@@ -6,7 +6,7 @@ This can create conflicts if your application already uses other versions of tho
 To avoid this, we provide an alternative core artifact that shades link:../integration/#netty[Netty], link:../integration/#jackson[Jackson] and link:../integration/#esri[ESRI].
 To use it, replace the dependency to `java-driver-core` by:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -17,7 +17,7 @@ To use it, replace the dependency to `java-driver-core` by:
 
 If you also use the query-builder, mapper or some other library that depends on java-driver-core, you need to remove its dependency to the non-shaded JAR:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -45,7 +45,7 @@ This should be transparent for client applications: the impacted dependencies ar
 * the driver is compatible with all Netty versions in the range `[4.1.7, 4.2.0)` (equal to or higher than 4.1.7, and lesser than 4.2.0).
 If you just need a specific version in that range, you can  avoid the need for the shaded JAR by declaring an explicit dependency in your POM:
 +
-[,xml]
+[source,xml]
 ----
   <dependency>
     <groupId>com.datastax.oss</groupId>

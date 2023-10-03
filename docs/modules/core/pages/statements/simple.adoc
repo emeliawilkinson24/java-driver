@@ -2,9 +2,9 @@
 
 == Quick overview
 
-For one-off executions of a raw query string.
+For one-off executions of a raw query string:
 
-* create with https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/SimpleStatement.html#newInstance-java.lang.String-[SimpleStatement.newInstance()] or https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/SimpleStatement.html#builder-java.lang.String-[SimpleStatement.builder()].
+* create with https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/SimpleStatement.html#newInstance-java.lang.String-[`SimpleStatement.newInstance()`] or https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/SimpleStatement.html#builder-java.lang.String-[`SimpleStatement.builder()`].
 * values: `?` or `:name`, fill with `setPositionalValues()` or `setNamedValues()` respectively.
 Driver has to guess target CQL types, this can lead to ambiguities.
 * built-in implementation is *immutable*.
@@ -12,7 +12,7 @@ Setters always return a new object, don't ignore the result.
 
 '''
 
-Use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/SimpleStatement.html[SimpleStatement] for queries that will be executed only once (or just a few times):
+Use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/SimpleStatement.html[`SimpleStatement`] for queries that will be executed only once (or just a few times):
 
 [source,java]
 ----
@@ -45,7 +45,7 @@ client                             driver                Cassandra
   |<---------------------------------|                     |
 ----
 
-If you execute the same query often (or a similar query with different column values), consider a link:../prepared/[prepared statement] instead.
+If you execute the same query often (or a similar query with different column values), consider a xref:core:statements/statements.adoc[prepared statement] instead.
 
 == Creating an instance
 
@@ -113,7 +113,7 @@ Instead of hard-coding everything in the query string, you can use bind markers 
 
 This syntax has a few advantages:
 
-* if the values come from some other part of your code, it looks cleaner than doing the  concatenation yourself;
+* if the values come from some other part of your code, it looks cleaner than doing the  concatenation yourself.
 * you don't need to translate the values to their string representation.
 The driver will send them  alongside the query, in their serialized binary form.
 
@@ -133,7 +133,7 @@ session.execute(
 
 == Type inference
 
-Another consequence of not parsing query strings is that the driver has to guess how to serialize  values, based on their Java type (see the link:../../#cql-to-java-type-mapping[default type mappings]).
+Another consequence of not parsing query strings is that the driver has to guess how to serialize  values, based on their Java type (see the xref:core:core-driver.adoc#cql-to-java-type-mapping[default type mappings]).
 This can be tricky, in particular for numeric types:
 
 [source,java]
@@ -187,4 +187,4 @@ session.execute(
         .build());
 ----
 
-Or you could also use link:../prepared/[prepared statements], which don't have this limitation since parameter types are known in advance.
+Or you could also use xref:core:statements/prepared.adoc[prepared statements], which don't have this limitation since parameter types are known in advance.

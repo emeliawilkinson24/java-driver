@@ -9,11 +9,12 @@ It is only required in the compile classpath.
 The `java-driver-mapper-runtime` artifact contains the annotations and a few utility classes.
 It is a regular dependency, required at runtime.
 
+[[maven]]
 === Maven
 
 The best approach is to add the `annotationProcessorPaths` option to the compiler plugin's configuration (make sure you use version 3.5 or higher):
 
-[,xml]
+[source,xml]
 ----
 <properties>
   <java-driver.version>...</java-driver.version>
@@ -58,7 +59,7 @@ The best approach is to add the `annotationProcessorPaths` option to the compile
 Alternatively (e.g.
 if you are using the link:../../core/bom/[BOM]), you may also declare the processor as a regular dependency in the "provided" scope:
 
-[,xml]
+[source,xml]
 ----
 <dependencies>
   <dependency>

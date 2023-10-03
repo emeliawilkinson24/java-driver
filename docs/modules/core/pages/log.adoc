@@ -18,7 +18,7 @@ To connect SLF4J to your logging framework, add a https://www.slf4j.org/manual.h
 If you use a build tool such as Maven or Gradle, this usually involves adding a runtime dependency to your application descriptor (`pom.xml` or `build.gradle`).
 For example, here is a Maven snippet for http://logback.qos.ch[Logback]:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
 	<groupId>ch.qos.logback</groupId>
@@ -29,7 +29,7 @@ For example, here is a Maven snippet for http://logback.qos.ch[Logback]:
 
 And the same for https://logging.apache.org/log4j[Log4J]:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>org.slf4j</groupId>
@@ -111,7 +111,7 @@ It logs driver messages of level INFO and above, and all other libraries at leve
 
 The appenders send all messages of level INFO and above to the console, and all messages to a rolling file (with the current configuration, the console and log file have the same contents, but if you were to enable DEBUG logs for a category, those logs would go to the file but not the console).
 
-[,xml]
+[source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
@@ -158,7 +158,7 @@ It logs driver messages of level INFO and above, and all other libraries at leve
 
 The appenders send all messages of level INFO and above to the console, and all messages to a rolling file (with the current configuration, the console and log file have the same contents, but if you were to enable DEBUG logs for a category, those logs would go to the file but not the console).
 
-[,xml]
+[source,xml]
 ----
 <log4j:configuration>
 

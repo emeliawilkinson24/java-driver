@@ -228,6 +228,7 @@ To resume our example above, if Region1 goes down, the load balancers in your in
 This is by far the best solution for the cross-datacenter failover issue in general, but we acknowledge that it also requires a purpose-built infrastructure.
 To help you explore this option, read our https://www.datastax.com/sites/default/files/content/whitepaper/files/2019-09/Designing-Fault-Tolerant-Applications-DataStax.pdf[white paper].
 
+[[token-aware]]
 === Token-aware
 
 The default policy is *token-aware* by default: requests will be routed in priority to the replicas that own the data being queried.

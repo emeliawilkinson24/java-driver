@@ -58,7 +58,7 @@ You enable Kotlin support with https://kotlinlang.org/docs/reference/using-gradl
 Configure https://kotlinlang.org/docs/reference/using-maven.html#compiling-kotlin-and-java-sources[dual compilation] of Kotlin and Java sources.
 In addition, you'll need an additional execution of the https://kotlinlang.org/docs/reference/kapt.html#using-in-maven[kotlin-maven-plugin:kapt] goal with the mapper processor before compilation:
 
-[,xml]
+[source,xml]
 ----
 <plugin>
   <groupId>org.jetbrains.kotlin</groupId>

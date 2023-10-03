@@ -4,7 +4,7 @@ A "Bill Of Materials" is a special Maven descriptor that defines the versions of
 
 To import the driver's BOM, add the following section in your application's own POM:
 
-[,xml]
+[source,xml]
 ----
 <project>
   ...
@@ -23,7 +23,7 @@ To import the driver's BOM, add the following section in your application's own 
 
 This allows you to omit the version when you later reference the driver artifacts:
 
-[,xml]
+[source,xml]
 ----
 <project>
   ...
@@ -41,12 +41,12 @@ The driver artifacts are always in sync, however they were pulled into the proje
 
 == BOM and mapper processor
 
-If you are using the driver's link:../../mapper[object mapper], our recommendation is to declare the mapper processor in the link:../../mapper/config/#maven[annotationProcessorPaths] section of the compiler plugin configuration.
+If you are using the driver's xref:mapper:mapper.adoc[object mapper], our recommendation is to declare the mapper processor in the xref:mapper:configure/integration.adoc#maven[annotationProcessorPaths] section of the compiler plugin configuration.
 Unfortunately, `<dependencyManagement>` versions don't work there, this is a known Maven issue (https://issues.apache.org/jira/browse/MCOMPILER-391[MCOMPILER-391]).
 
 As a workaround, you can either declare the mapper processor as a regular dependency in the provided scope:
 
-[,xml]
+[source,xml]
 ----
   <dependencies>
     <dependency>
@@ -60,7 +60,7 @@ As a workaround, you can either declare the mapper processor as a regular depend
 Or keep it in the compiler plugin, but repeat the version explicitly.
 In that case, it's probably a good idea to extract a property to keep it in sync with the BOM:
 
-[,xml]
+[source,xml]
 ----
 <project>
   <properties>

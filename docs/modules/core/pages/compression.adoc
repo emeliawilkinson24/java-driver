@@ -14,11 +14,12 @@ Also available: LZ4, Snappy.
 Cassandra's binary protocol supports optional compression of requests and responses.
 This reduces network traffic at the cost of a slight CPU overhead, therefore it will likely be beneficial when you have larger payloads, such as:
 
-* requests with many values, or very large values;
-* responses with many rows, or many columns per row, or very large columns.
+* requests with many values, or very large values
+* responses with many rows, or many columns per row, or very large columns
 
-To enable compression, set the following option in the link:../configuration[configuration]:
+To enable compression, set the following option in the xref:core:configuration.adoc[configuration]:
 
+[hocon]
 ----
 datastax-java-driver {
   advanced.protocol.compression = lz4 // or snappy
@@ -28,17 +29,16 @@ datastax-java-driver {
 Compression must be set before opening a session, it cannot be changed at runtime.
 
 Two algorithms are supported out of the box: https://github.com/jpountz/lz4-java[LZ4] and http://google.github.io/snappy/[Snappy].
-The LZ4 implementation is a good first choice;
-it offers fallback implementations in case native libraries fail to load and http://java-performance.info/performance-general-compression/[benchmarks] suggest that it offers better performance and compression ratios over Snappy.
+The LZ4 implementation is a good first choice because it offers fallback implementations in case native libraries fail to load and http://java-performance.info/performance-general-compression/[benchmarks] suggest that it offers better performance and compression ratios over Snappy.
 
 Both implementations rely on third-party libraries, declared by the driver as _optional_ dependencies;
-if you enable compression, you need to explicitly depend on the corresponding library to pull it into your project (see the link:../integration/#driver-dependencies[Integration>Driver dependencies] section for more details).
+if you enable compression, you need to explicitly depend on the corresponding library to pull it into your project (see the xref:core:integration.adoc#driver-dependencies[Integration>Driver dependencies] section for more details).
 
 == LZ4
 
 Dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>org.lz4</groupId>
@@ -47,18 +47,18 @@ Dependency:
 </dependency>
 ----
 
-Always double-check the exact LZ4 version needed;
-you can find it in the driver's https://search.maven.org/search?q=g:com.datastax.oss%20AND%20a:java-driver-parent&core=gav[parent POM].
+Always double-check the exact LZ4 version needed in the driver's https://search.maven.org/search?q=g:com.datastax.oss%20AND%20a:java-driver-parent&core=gav[parent POM].
 
 LZ4-java has three internal implementations (from fastest to slowest):
 
-* JNI;
-* pure Java using `sun.misc.Unsafe`;
-* pure Java using only "safe" classes.
+* JNI
+* pure Java using `sun.misc.Unsafe`
+* pure Java using only "safe" classes
 
 It will pick the best implementation depending on what's possible on your platform.
-To find out which one was chosen, link:../logging/[enable INFO logs] on the category `com.datastax.oss.driver.internal.core.protocol.Lz4Compressor` and look for the following message:
+To find out which one was chosen, xref:core:log.adoc[enable INFO logs] on the category `com.datastax.oss.driver.internal.core.protocol.Lz4Compressor` and look for the following message:
 
+[source,log]
 ----
 INFO  com.datastax.oss.driver.internal.core.protocol.Lz4Compressor  - Using LZ4Factory:JNI
 ----
@@ -67,7 +67,7 @@ INFO  com.datastax.oss.driver.internal.core.protocol.Lz4Compressor  - Using LZ4F
 
 Dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>org.xerial.snappy</groupId>
@@ -76,7 +76,9 @@ Dependency:
 </dependency>
 ----
 
-*Important: Snappy is not supported when building a link:../graalvm[GraalVM native image].*
+[IMPORTANT]
+====
+Snappy is not supported when building a xref:core:graalvm.adoc[GraalVM native image].
+====
 
-Always double-check the exact Snappy version needed;
-you can find it in the driver's https://search.maven.org/search?q=g:com.datastax.oss%20AND%20a:java-driver-parent&core=gav[parent POM].
+Always double-check the exact Snappy version needed in the driver's https://search.maven.org/search?q=g:com.datastax.oss%20AND%20a:java-driver-parent&core=gav[parent POM].

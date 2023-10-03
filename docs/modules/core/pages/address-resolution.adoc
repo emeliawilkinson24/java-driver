@@ -18,18 +18,19 @@ Each node in the Cassandra cluster is uniquely identified by an IP address that 
 
 == Cassandra-side configuration
 
-The address that each Cassandra node shares with clients is the *broadcast RPC address*;
-it is controlled by various properties in https://docs.datastax.com/en/cassandra/3.x/cassandra/configuration/configCassandra_yaml.html[cassandra.yaml]:
+The address that each Cassandra node shares with clients is the *broadcast RPC address*.
+This is controlled by various properties in https://docs.datastax.com/en/cassandra/3.x/cassandra/configuration/configCassandra_yaml.html[`cassandra.yaml`]:
 
-* https://docs.datastax.com/en/cassandra/3.x/cassandra/configuration/configCassandra_yaml.html?scroll=configCassandra_yaml%5F%5Frpc_address[rpc_address] or https://docs.datastax.com/en/cassandra/3.x/cassandra/configuration/configCassandra_yaml.html?scroll=configCassandra_yaml%5F%5Frpc_interface[rpc_interface] is the address that the Cassandra process _binds to_.
-You must set one or the other, not both (for more details, see the inline comments in the default `cassandra.yaml` that came with your installation);
-* https://docs.datastax.com/en/cassandra/3.x/cassandra/configuration/configCassandra_yaml.html?scroll=configCassandra_yaml%5F%5Fbroadcast_rpc_address[broadcast_rpc_address] (introduced in Cassandra 2.1) is the address to share with clients, if it is different than the previous one (the reason for having a separate property is if the bind address is not public to clients, because there is a router in between).
+* https://docs.datastax.com/en/cassandra/3.x/cassandra/configuration/configCassandra_yaml.html?scroll=configCassandra_yaml%5F%5Frpc_address[`rpc_address`] or https://docs.datastax.com/en/cassandra/3.x/cassandra/configuration/configCassandra_yaml.html?scroll=configCassandra_yaml%5F%5Frpc_interface[`rpc_interface`] is the address that the Cassandra process _binds to_.
+You must set one or the other, not both (for more details, see the inline comments in the default `cassandra.yaml` that came with your installation).
+* https://docs.datastax.com/en/cassandra/3.x/cassandra/configuration/configCassandra_yaml.html?scroll=configCassandra_yaml%5F%5Fbroadcast_rpc_address[`broadcast_rpc_address`] (introduced in Cassandra 2.1) is the address to share with clients if it is different than the previous one (having a separate property is recommended if the bind address is not public to clients because there is a router in between).
 
 If `broadcast_rpc_address` is not set, it defaults to `rpc_address`/`rpc_interface`.
-If `rpc_address`/`rpc_interface` is 0.0.0.0 (all interfaces), then `broadcast_rpc_address` _must_ be set.
+If `rpc_address`/`rpc_interface` is 0.0.0.0 (all interfaces), then `broadcast_rpc_address` *must* be set.
 
 If you're not sure which address a Cassandra node is broadcasting, launch cqlsh locally on the node, execute the following query and take node of the result:
 
+[source,cql]
 ----
 cqlsh> select broadcast_address from system.local;
 
@@ -38,8 +39,9 @@ cqlsh> select broadcast_address from system.local;
          172.1.2.3
 ----
 
-Then connect to _another_ node in the cluster and run the following query, injecting the previous result:
+Then connect to *another* node in the cluster and run the following query, injecting the previous result:
 
+[source,cql]
 ----
 cqlsh> select rpc_address from system.peers where peer = '172.1.2.3';
 
@@ -53,8 +55,8 @@ Ensure that it is accessible from the client machine where the driver will run.
 
 == Driver-side address translation
 
-Sometimes it's not possible for Cassandra nodes to broadcast addresses that will work for each and every client;
-for instance, they might broadcast private IPs because most clients are in the same network, but a particular client could be on another network and go through a router.
+Sometimes it's not possible for Cassandra nodes to broadcast addresses that will work for each and every client.
+For instance, they might broadcast private IPs because most clients are in the same network, but a particular client could be on another network and go through a router.
 
 For such cases, you can register a driver-side component that will perform additional address translation.
 Write a class that implements https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/addresstranslation/AddressTranslator.html[AddressTranslator] with the following constructor:
@@ -81,11 +83,15 @@ public class MyAddressTranslator implements AddressTranslator {
 
 Then reference this class from the link:../configuration/[configuration]:
 
+[source,hocon]
 ----
 datastax-java-driver.advanced.address-translator.class = com.mycompany.MyAddressTranslator
 ----
 
-NOTE: the contact points provided while creating the `CqlSession` are not translated, only addresses retrieved from or sent by Cassandra nodes are.
+[NOTE]
+====
+The contact points provided while creating the `CqlSession` are not translated, only addresses retrieved from or sent by Cassandra nodes are.
+====
 
 == EC2 multi-region
 
@@ -95,8 +101,9 @@ However, this is not always the most cost-effective: if a client and a node are 
 Ideally, you'd want to pick the best address in each case.
 
 The driver provides `Ec2MultiRegionAddressTranslator` which does exactly that.
-To use it, specify the following in the link:../configuration/[configuration]:
+To use it, specify the following in the xref:core:configuration.adoc[configuration]:
 
+[source,hocon]
 ----
 datastax-java-driver.advanced.address-translator.class = Ec2MultiRegionAddressTranslator
 ----

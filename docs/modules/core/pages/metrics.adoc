@@ -35,7 +35,7 @@ datastax-java-driver.advanced.metrics {
 . Add a dependency to `java-driver-metrics-micrometer` in your application.
 This separate driver module contains the actual bindings for Micrometer, and depends itself on the Micrometer library:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -46,7 +46,7 @@ This separate driver module contains the actual bindings for Micrometer, and dep
 
 . You should also exclude Dropwizard and HdrHistogram, which are two transitive dependencies of the driver, because they are not relevant when using Micrometer:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -79,7 +79,7 @@ datastax-java-driver.advanced.metrics {
 . Add a dependency to `java-driver-metrics-microprofile` in your application.
 This separate driver module contains the actual bindings for MicroProfile, and depends itself on the MicroProfile Metrics library:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -90,7 +90,7 @@ This separate driver module contains the actual bindings for MicroProfile, and d
 
 . You should also exclude Dropwizard and HdrHistogram, which are two transitive dependencies of the driver, because they are not relevant when using MicroProfile Metrics:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -253,7 +253,7 @@ Micrometer also has support for JMX: please refer to its https://micrometer.io/d
 
 Add the following dependency to your application (make sure the version matches the `metrics-core` dependency of the driver):
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>io.dropwizard.metrics</groupId>

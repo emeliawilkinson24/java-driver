@@ -5,7 +5,7 @@
 * `advanced.auth-provider` in the configuration.
 * disabled by default.
 Also available: plain-text credentials, GSSAPI (DSE only), or write your own.
-* can also be defined programmatically: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#withAuthCredentials-java.lang.String-java.lang.String-[CqlSession.builder().withAuthCredentials] or https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#withAuthProvider-com.datastax.oss.driver.api.core.auth.AuthProvider-[CqlSession.builder().withAuthProvider].
+* can also be defined programmatically: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#withAuthCredentials-java.lang.String-java.lang.String-[`CqlSession.builder().withAuthCredentials`] or https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#withAuthProvider-com.datastax.oss.driver.api.core.auth.AuthProvider-[`CqlSession.builder().withAuthProvider`].
 
 '''
 
@@ -16,8 +16,9 @@ This can be done in two ways:
 
 == In the configuration
 
-Define an `auth-provider` section in the link:../configuration/[configuration]:
+Define an `auth-provider` section in the xref:core:configuration.adoc[configuration]:
 
+[source,hocon]
 ----
 datastax-java-driver {
   advanced.auth-provider {
@@ -33,6 +34,7 @@ The auth provider must be configured before opening a session, it cannot be chan
 `PlainTextAuthProvider` supports simple username/password authentication (intended to work with the server-side `PasswordAuthenticator`).
 The credentials can be changed at runtime, they will be used for new connection attempts once the configuration gets reloaded.
 
+[source,hocon]
 ----
 datastax-java-driver {
   advanced.auth-provider {
@@ -47,6 +49,7 @@ When connecting to DSE, an optional `authorization-id` can also be specified.
 It will be used for proxy authentication (logging in as another user or role).
 If you try to use this feature with an authenticator that doesn't support it, the authorization id will be ignored.
 
+[source,hocon]
 ----
 datastax-java-driver {
   advanced.auth-provider {
@@ -58,12 +61,13 @@ datastax-java-driver {
 }
 ----
 
-Note that, for backward compatibility with previous driver versions, you can also use the class name `DsePlainTextAuthProvider` to enable this provider.
+Note that for backward compatibility with previous driver versions you can also use the class name `DsePlainTextAuthProvider` to enable this provider.
 
 === GSSAPI (DSE only)
 
 `DseGssApiAuthProvider` supports GSSAPI authentication against a DSE cluster secured with Kerberos:
 
+[source,hocon]
 ----
 datastax-java-driver {
   advanced.auth-provider {
@@ -78,13 +82,13 @@ datastax-java-driver {
  }
 ----
 
-See the comments in link:../configuration/reference/[reference.conf] for more details.
+See the comments in https://github.com/datastax/java-driver/blob/4.x/manual/core/configuration/reference[reference.conf] for more details.
 
 === Custom
 
-You can also write your own provider;
-it must implement https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/auth/AuthProvider.html[AuthProvider] and declare a public constructor with a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/context/DriverContext.html[DriverContext] argument.
+You can also write your own provider, but it must implement https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/auth/AuthProvider.html[AuthProvider] and declare a public constructor with a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/context/DriverContext.html[DriverContext] argument.
 
+[source,hocon]
 ----
 datastax-java-driver {
   advanced.auth-provider {
@@ -135,8 +139,8 @@ CqlSession session =
         .build();
 ----
 
-One downside of the driver's built-in authentication providers is that the credentials are stored in clear text in memory;
-this means they are vulnerable to an attacker who is able to perform memory dumps.
+One downside of the driver's built-in authentication providers is that the credentials are stored in clear text in memory.
+This means they are vulnerable to an attacker who is able to perform memory dumps.
 If this is not acceptable for you, consider writing your own https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/auth/AuthProvider.html[AuthProvider] implementation;
 https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/auth/PlainTextAuthProviderBase.html[PlainTextAuthProviderBase] is a good starting point.
 
@@ -161,6 +165,7 @@ if building the options once and reusing them doesn't work for you), you can sub
 
 DSE allows a user to connect as another user or role:
 
+[source,no-highlight]
 ----
 -- Allow bob to connect as alice:
 GRANT PROXY.LOGIN ON ROLE 'alice' TO 'bob'
@@ -172,6 +177,7 @@ To use proxy authentication with the driver, you need to provide the *authorizat
 
 Example for plain text authentication:
 
+[source,hocon]
 ----
 datastax-java-driver {
   advanced.auth-provider {
@@ -185,6 +191,7 @@ datastax-java-driver {
 
 With the GSSAPI (Kerberos) provider:
 
+[source,hocon]
 ----
 datastax-java-driver {
   advanced.auth-provider {
@@ -204,6 +211,7 @@ datastax-java-driver {
 
 Proxy execution is similar to proxy authentication, but it applies to a single query, not the whole session.
 
+[source,no-highlight]
 ----
 -- Allow bob to execute queries as alice:
 GRANT PROXY.EXECUTE ON ROLE 'alice' TO 'bob'

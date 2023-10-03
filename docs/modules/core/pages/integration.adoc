@@ -66,7 +66,7 @@ Create the following 4 files:
 `pom.xml` is the https://maven.apache.org/guides/introduction/introduction-to-the-pom.html[Project Object Model] that describes your application.
 We declare the dependencies, and tell Maven that we're going to use Java 8:
 
-[,xml]
+[source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -122,7 +122,7 @@ In this case, we just specify a custom name for our session, it will appear in t
 For this example, we choose Logback as our link:../logging/[logging framework] (we added the dependency in `pom.xml`).
 `logback.xml` configures it to send the driver's `INFO` logs to the console.
 
-[,xml]
+[source,xml]
 ----
 <configuration>
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -295,7 +295,7 @@ It is a required dependency if you use the driver's built-in configuration loade
 
 In that case, you can exclude the dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -323,7 +323,7 @@ if system calls are not available on the current platform, or the library fails 
 
 If you don't want to use system calls, or already know (from looking at the driver's logs) that they are not available on your platform, you can exclude the following dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -353,7 +353,7 @@ The driver exposes link:../metrics/[metrics] through the http://metrics.dropwiza
 The dependency is declared as required, but metrics are optional.
 If you've disabled all metrics, or if you are using a different metrics library, and you never call https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/Session.html#getMetrics--[Session.getMetrics] anywhere in your application, then you can remove the dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -374,7 +374,7 @@ you can also identify them by reading the comments in the link:../configuration/
 
 If all of these metrics are disabled, or if you use a different metrics library, you can remove the dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -400,7 +400,7 @@ https://github.com/FasterXML/jackson[Jackson] is used:
 Jackson is declared as a required dependency, but the driver can operate normally without it.
 If you don't use any of the above features, you can safely exclude the dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -422,7 +422,7 @@ Our link:../dse/geotypes/[geospatial types] implementation is based on the https
 For driver versions >= 4.4.0 and < 4.14.0 Esri is declared as a required dependency, although the driver can operate normally without it.
 If you don't use geospatial types anywhere in your application you can exclude the dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -440,7 +440,7 @@ If you don't use geospatial types anywhere in your application you can exclude t
 Starting with driver 4.14.0 Esri has been changed to an optional dependency.
 You no longer have to explicitly exclude the dependency if it's not used, but if you do wish to make use of the Esri library you must now explicitly specify it as a dependency :
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.esri.geometry</groupId>
@@ -459,7 +459,7 @@ http://tinkerpop.apache.org/[Apache TinkerPop™] is used in our link:../dse/gra
 For driver versions ranging from 4.4.0 to 4.9.0 inclusive, TinkerPop is declared as a required dependency, but the driver can operate normally without it.
 If you don't use the graph API at all, you can exclude the TinkerPop dependencies:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -478,7 +478,7 @@ Starting with driver 4.10 however, TinkerPop switched to an optional dependency.
 Excluding TinkerPop explicitly is not required anymore if you don't use it.
 _If you do use the graph API though, you now need to explicitly include the dependencies below in your application_:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>org.apache.tinkerpop</groupId>
@@ -519,7 +519,7 @@ https://www.reactive-streams.org/[Reactive Streams] types are referenced in our 
 The Reactive Streams API is declared as a required dependency, but the driver can operate normally without it.
 If you never call any of the `executeReactive` methods, you can exclude the dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>
@@ -545,7 +545,7 @@ This is mostly used during development;
 while these annotations are retained in class files, they serve no purpose at runtime.
 If you want to minimize the number of JARs in your classpath, you can exclude them:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>

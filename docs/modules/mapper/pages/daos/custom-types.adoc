@@ -205,7 +205,7 @@ One downside is that validation can now only be done at runtime: if you use a re
 
 *If you don't use custom types at all*, you can disable the feature with an annotation processor flag:
 
-[,xml]
+[source,xml]
 ----
   <build>
     <plugins>

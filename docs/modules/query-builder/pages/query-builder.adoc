@@ -8,7 +8,7 @@ For example, it could be used to:
 
 To use it in your application, add the following dependency:
 
-[,xml]
+[source,xml]
 ----
 <dependency>
   <groupId>com.datastax.oss</groupId>

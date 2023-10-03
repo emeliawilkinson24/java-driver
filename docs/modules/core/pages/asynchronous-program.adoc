@@ -11,7 +11,7 @@ Async driver methods return Java 8's https://docs.oracle.com/javase/8/docs/api/j
 '''
 
 The driver exposes an asynchronous API that allows you to write fully non-blocking programs.
-Asynchronous methods return instances of the JDK's https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletionStage.html[CompletionStage], that can be conveniently chained and composed.
+Asynchronous methods return instances of the JDK's https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletionStage.html[CompletionStage] that can be conveniently chained and composed.
 
 Here is a short example that opens a session and runs a query asynchronously:
 
@@ -43,7 +43,7 @@ resultStage.whenComplete(
 == Threading model
 
 The driver uses two internal thread pools: one for request I/O and one for administrative tasks (such as metadata refreshes, schema agreement or processing server events).
-Note that you can control the size of these pools with the `advanced.netty` options in the link:../configuration[configuration].
+Note that you can control the size of these pools with the `advanced.netty` options in the xref:core:configuration.adoc[configuration].
 
 When you register a callback on a completion stage, it will execute on a thread in the corresponding pool:
 
@@ -60,7 +60,7 @@ resultStage.thenAccept(resultSet -> System.out.println(Thread.currentThread().ge
 ----
 
 As long as you use the asynchronous API, the driver will behave in a non-blocking manner: its  internal threads will almost never block.
-There are a few exceptions to the rule though: see the  manual page on link:../non_blocking[non-blocking programming] for details.
+There are a few exceptions to the rule though: see the  manual page on xref:core:non-block.adoc[non-blocking programming] for details.
 
 Because the asynchronous API is non-blocking, you can safely call a driver method from inside a  callback, even when the callback's execution is triggered by a future returned by the driver:
 
@@ -82,9 +82,9 @@ CompletionStage<AsyncResultSet> dataStage =
 ----
 
 However, you can't call a synchronous method from a callback.
-This would be very unsafe, because the driver blocks until the response is received;
-if the request happened to be assigned to the same I/O thread that is currently running the callback, it would deadlock.
-In fact, the driver detects this situation, and fails fast with a runtime exception to eliminate any chance of a hard-to-debug deadlock:
+This would be very unsafe, because the driver blocks until the response is received.
+If the request happened to be assigned to the same I/O thread that is currently running the callback, it would deadlock.
+The driver detects this situation and fails fast with a runtime exception to eliminate any chance of a hard-to-debug deadlock:
 
 [source,java]
 ----
@@ -201,4 +201,4 @@ Either add a `try/catch` block in the callback, or don't ignore the result of `w
 Unlike previous versions of the driver, the asynchronous API never triggers synchronous behavior, even when iterating through the results of a request.
 `session.executeAsync` returns a dedicated https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/AsyncResultSet.html[AsyncResultSet] that only iterates the current page, the next pages must be fetched explicitly.
 This greatly simplifies asynchronous paging;
-see the link:../paging/#asynchronous-paging[paging] documentation for more details and an example.
+see the xref:core:page.adoc#asynchronous-paging[paging] documentation for more details and an example.
