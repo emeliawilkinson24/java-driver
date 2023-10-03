@@ -51,5 +51,4 @@
 ** xref:core:statements/prepared.adoc[]
 ** xref:core:statements/simple.adoc[]
 ** xref:core:statements/statements.adoc[]
-
-
+** xref:core:developer/common/common.adoc[]
