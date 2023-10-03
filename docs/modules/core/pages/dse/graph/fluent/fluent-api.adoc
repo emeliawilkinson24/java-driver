@@ -11,12 +11,13 @@ GraphTraversalSource g = ...
 GraphTraversal<Vertex, Vertex> traversal = g.V().has("name", "marko");
 ----
 
+[#execution-models]
 == Execution models
 
 There are two ways to execute fluent traversals:
 
-* link:explicit/[explicitly] by wrapping a traversal into a statement and passing it to `session.execute`
-* link:implicit/[implicitly] by building the traversal from a connected source, and calling a terminal step
+* xref:core:dse/graph/fluent/explicit-execution.adoc[explicitly] by wrapping a traversal into a statement and passing it to `session.execute`
+* xref:core:dse/graph/fluent/implicit-execution.adoc[implicitly] by building the traversal from a connected source, and calling a terminal step
 
 == Common topics
 
