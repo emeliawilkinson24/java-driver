@@ -16,7 +16,7 @@ defaults to exponential backoff, also available: constant delay, write your own.
 If a running session loses a connection to a node, it tries to re-establish it according to a configurable policy.
 This is used in two places:
 
-* link:../pooling/[connection pools]: for each node, a session has a fixed-size pool of connections to execute user requests.
+* xref:core:connection-pool.adoc[connection pools]: for each node, a session has a fixed-size pool of connections to execute user requests.
 If one or more connections drop, a reconnection gets started for the pool;
 each attempt tries to reopen the missing number of connections.
 This goes on until the pool is back to its expected size;
@@ -26,7 +26,7 @@ each attempt iterates through all active nodes until one of them accepts a conne
 This goes on until we have a control node again.
 
 The reconnection policy controls the interval between each attempt.
-It is defined in the link:../configuration/[configuration]:
+It is defined in the xref:core:configuration.adoc[configuration]:
 
 ----
 datastax-java-driver {
@@ -63,7 +63,7 @@ A reconnection starts for the control connection, with the next attempt in 1 sec
 * [t = 2.2], node3's pool tries to open its missing connection, which succeeds.
 The pool is back to its expected size, node3's reconnection stops;
 * [t = 2.5] the control connection tries to find a new node.
-It invokes the link:../load_balancing/[load balancing policy] to get a query plan, which happens to start with node4.
+It invokes the xref:core:load-balance.adoc[load balancing policy] to get a query plan, which happens to start with node4.
 The connection succeeds, node4 is now the control node and the reconnection stops;
 * [t = 3] node2's pool tries to open the last missing connection, which succeeds.
 The pool is back to its expected size, node2's reconnection stops.

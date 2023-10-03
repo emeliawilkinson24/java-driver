@@ -77,7 +77,7 @@ If a query is link:../idempotence/[not idempotent], the driver will never schedu
 
 == Configuration
 
-Speculative executions are controlled by a policy defined in the link:../configuration/[configuration].
+Speculative executions are controlled by a policy defined in the xref:core:configuration.adoc[configuration].
 The default implementation never schedules an execution:
 
 ----
@@ -159,22 +159,22 @@ The goal of speculative executions is to improve overall latency (the time betwe
 On the flip side, too many speculative executions increase the pressure on the cluster.
 
 If you use speculative executions to avoid unhealthy nodes, a good-behaving node should rarely hit the threshold.
-We recommend running a benchmark on a healthy platform (all nodes up and healthy) and monitoring the request percentiles with the `cql-requests` link:../metrics/[metric].
+We recommend running a benchmark on a healthy platform (all nodes up and healthy) and monitoring the request percentiles with the `cql-requests` xref:core:metrics.adoc[metric].
 Then use the latency at a high percentile (for example p99.9) as the threshold.
 
 Alternatively, maybe low latency is your absolute priority, and you are willing to take the increased throughput as a tradeoff.
 In that case, set the threshold to 0 and provision your cluster accordingly.
 
-You can monitor the number of speculative executions triggered by each node with the `speculative-executions` link:../metrics/[metric].
+You can monitor the number of speculative executions triggered by each node with the `speculative-executions` xref:core:metrics.adoc[metric].
 
 === Stream id exhaustion
 
-One side-effect of speculative executions is that many requests get cancelled, which can lead to a phenomenon called _stream id exhaustion_: each TCP connection can handle multiple simultaneous requests, identified by a unique number called _stream id_ (see also the link:../pooling/[pooling] section).
+One side-effect of speculative executions is that many requests get cancelled, which can lead to a phenomenon called _stream id exhaustion_: each TCP connection can handle multiple simultaneous requests, identified by a unique number called _stream id_ (see also the xref:core:connection-pool.adoc[pooling] section).
 When a request gets cancelled, we can't reuse its stream id immediately because we might still receive a response from the server later.
 If this happens often, the number of available stream ids diminishes over time, and when it goes below a given threshold we close the connection and create a new one.
 If requests are often cancelled, you will see connections being recycled at a high rate.
 
-The best way to monitor this is to compare the `pool.orphaned-streams` link:../metrics/[metric] to the total number of available stream ids (which can be computed from the configuration: `pool.local.size * max-requests-per-connection`).
+The best way to monitor this is to compare the `pool.orphaned-streams` xref:core:metrics.adoc[metric] to the total number of available stream ids (which can be computed from the configuration: `pool.local.size * max-requests-per-connection`).
 The `pool.available-streams` and `pool.in-flight` metrics will also give you an idea of how many stream ids are left for active queries.
 
 === Request ordering
@@ -206,7 +206,7 @@ Or use a client-side link:../query_timestamps/[timestamp generator].
 
 == Using multiple policies
 
-The speculative execution policy can be overridden in link:../configuration/#profiles[execution profiles]:
+The speculative execution policy can be overridden in xref:core:configuration.adoc#profiles[execution profiles]:
 
 ----
 datastax-java-driver {

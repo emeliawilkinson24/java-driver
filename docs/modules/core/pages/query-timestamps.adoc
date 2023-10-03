@@ -32,7 +32,7 @@ session.execute("INSERT INTO my_table(c1, c2) values (1, 1) " +
 The driver has a timestamp generator that gets invoked for every outgoing request;
 it either assigns a client-side timestamp to the request, or indicates that the server should assign it.
 
-The timestamp generator is defined in the link:../configuration/[configuration].
+The timestamp generator is defined in the xref:core:configuration.adoc[configuration].
 
 === AtomicTimestampGenerator
 
@@ -121,7 +121,7 @@ You can create your own generator by implementing https://docs.datastax.com/en/d
 
 === Using multiple generators
 
-The timestamp generator can be overridden in link:../configuration/#profiles[execution profiles]:
+The timestamp generator can be overridden in xref:core:configuration.adoc#profiles[execution profiles]:
 
 ----
 datastax-java-driver {

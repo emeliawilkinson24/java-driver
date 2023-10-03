@@ -66,7 +66,7 @@ By default, the driver opens 1 connection per node, and allows 1024 concurrent r
 In our experience this is enough for most scenarios.
 
 If your application generates a very high throughput (hundreds of thousands of requests per second),  you might want to experiment with different settings.
-See the link:../pooling/#tuning[tuning] section in the connection pooling page.
+See the xref:core:connection-pool.adoc#tuning[tuning] section in the connection pooling page.
 
 === Compression
 
@@ -97,14 +97,14 @@ They should avoid blocking calls, as well as any CPU-intensive computations.
 
 === Metrics
 
-Similarly, some of the driver's link:../metrics/[metrics] are updated for every request (if the metric is enabled).
+Similarly, some of the driver's xref:core:metrics.adoc[metrics] are updated for every request (if the metric is enabled).
 
 By default, the driver ships with all metrics disabled.
 Enable them conservatively, and if you're investigating a performance issue, try disabling them temporarily to check that they are not the cause.
 
 === Throttling
 
-link:../throttling/[Throttling] can help establish more predictable server performance, by controlling how much load each driver instance is allowed to put on the cluster.
+xref:core:throttle.adoc/[Throttling] can help establish more predictable server performance, by controlling how much load each driver instance is allowed to put on the cluster.
 The throttling algorithm itself incurs a bit of overhead in the driver, but that shouldn't be a problem since the goal is to stay under reasonable rates in the first place.
 
 If you're debugging an unfamiliar application and experience a throughput plateau, make sure that it's not caused by a throttler.
@@ -173,7 +173,7 @@ Note that you don't necessarily need to extract `CqlIdentifier` constants since 
 
 === Derived configuration profiles
 
-The configuration API allows you to build link:../configuration/#derived-profiles[derived profiles] at runtime.
+The configuration API allows you to build xref:core:configuration.adoc#derived-profiles[derived profiles] at runtime.
 
 [source,java]
 ----
@@ -186,7 +186,7 @@ Their use is generally discouraged (you should define profiles statically in the
 
 == Metadata
 
-The driver maintains link:../metadata/[metadata] about the state of the Cassandra cluster.
+The driver maintains xref:core:metadata/metadata.adoc[metadata] about the state of the Cassandra cluster.
 This work is done on dedicated "admin" threads (see the <<thread-pooling,thread pooling>> section below), so it's not in direct competition with regular requests.
 
 === Filtering
@@ -203,11 +203,11 @@ datastax-java-driver.advanced.metadata {
 This will save CPU and memory resources, but you lose some driver features:
 
 * if schema is disabled, `session.getMetadata().getKeyspaces()` will always be empty: your application won't be able to inspect the database schema dynamically.
-* if the token map is disabled, `session.getMetadata().getTokenMap()` will always be empty, and you lose the ability to use link:../load_balancing/#token-aware[token-aware routing].
+* if the token map is disabled, `session.getMetadata().getTokenMap()` will always be empty, and you lose the ability to use xref:core:load-balance.adoc#token-aware[token-aware routing].
 
 Note that disabling the schema implicitly disables the token map (because computing the token map requires the keyspace replication settings).
 
-Perhaps more interestingly, metadata can be link:../metadata/schema/#filtering[filtered] to a specific subset of keyspaces.
+Perhaps more interestingly, metadata can be xref:core:metadata/schema.adoc#filtering[filtered] to a specific subset of keyspaces.
 This is handy if you connect to a shared cluster that holds data for multiple applications:
 
 ----
@@ -272,13 +272,13 @@ You may adjust those settings depending on your application's needs: higher valu
 You should group your schema changes as much as possible.
 
 Every change made from a client will be pushed to all other clients, causing them to refresh their metadata.
-If you have multiple client instances, it might be a good idea to link:../metadata/schema/#enabling-disabling[deactivate the metadata] on all clients while you apply the updates, and reactivate it at the end (reactivating will trigger an immediate refresh, so you might want to ramp up clients to avoid a "thundering herd" effect).
+If you have multiple client instances, it might be a good idea to xref:core:metadata/schema.adoc#enabling-disabling[deactivate the metadata] on all clients while you apply the updates, and reactivate it at the end (reactivating will trigger an immediate refresh, so you might want to ramp up clients to avoid a "thundering herd" effect).
 
 Schema changes have to replicate to all nodes in the cluster.
 To minimize the chance of schema disagreement errors:
 
 * apply your changes serially.
-The driver handles this automatically by checking for link:../metadata/schema/#schema-agreement[schema agreement] after each DDL query.
+The driver handles this automatically by checking for xref:core:metadata/schema.adoc#schema-agreement[schema agreement] after each DDL query.
 Run them from the same application thread, and, if you use the asynchronous API, chain the futures properly.
 * send all the changes to the same coordinator.
 This is one of the rare cases where we recommend using https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/Statement.html#setNode-com.datastax.oss.driver.api.core.metadata.Node-[Statement.setNode()].
@@ -295,7 +295,7 @@ Hot code runs on 3 categories of threads:
 You can configure it with the options in `datastax-java-driver.advanced.netty.io-group`.
  ** the driver's "timer" thread for request timeouts and speculative executions.
 See `datastax-java-driver.advanced.netty.timer`.
-* the *cold path* is for all administrative tasks: managing the link:../control_connection[control connection], parsing link:../metadata/[metadata], reacting to cluster events (node going up/down, getting added/removed, etc), and scheduling periodic events (reconnections, reloading the configuration).
+* the *cold path* is for all administrative tasks: managing the link:../control_connection[control connection], parsing xref:core:metadata/metadata.adoc[metadata], reacting to cluster events (node going up/down, getting added/removed, etc), and scheduling periodic events (reconnections, reloading the configuration).
 Comparatively, these tasks happen less often, and are less critical (for example, stale schema metadata is not a blocker for request execution).
 They are scheduled on a separate "admin" event loop group, controlled by the options in `datastax-java-driver.advanced.netty.admin-group`.
 

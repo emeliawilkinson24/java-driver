@@ -40,7 +40,7 @@ SimpleStatement statement =
         .build();
 ----
 
-If you don't, they default to the value defined in the link:../configuration/[configuration] by the `basic.request.default-idempotence` option;
+If you don't, they default to the value defined in the xref:core:configuration.adoc[configuration] by the `basic.request.default-idempotence` option;
 out of the box, it is set to `false`.
 
 When you prepare a statement, its idempotence carries over to bound statements:

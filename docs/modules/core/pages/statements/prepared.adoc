@@ -12,8 +12,6 @@ More efficient than simple statements for queries that are used often.
 * built-in implementation is *immutable*.
 Setters always return a new object, don't ignore the result.
 
-'''
-
 Use prepared statements for queries that are executed multiple times in your application:
 
 [source,java]

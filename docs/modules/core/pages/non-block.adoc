@@ -82,7 +82,7 @@ The same is valid for both built-in https://docs.datastax.com/en/drivers/java/4.
 * `ConcurrencyLimitingRequestThrottler`
 * `RateLimitingRequestThrottler`
 
-See the section about link:../throttling[throttling] for details about these components.
+See the section about xref:core:throttle.adoc[throttling] for details about these components.
 Again, they  use locks internally, and depending on how many requests are being executed in parallel, the thread contention on these locks can be high: in short, if your application enforces strict lock-freedom,  then these components should not be used.
 
 Other components may be lock-free, _except_ for their first invocation.

@@ -7,18 +7,16 @@ One connection pool per node.
 
 * `advanced.connection` in the configuration: `max-requests-per-connection`, `pool.local.size`, `pool.remote.size`.
 * metrics (per node): `pool.open-connections`, `pool.in-flight`, `pool.available-streams`, `pool.orphaned-streams`.
-* heartbeat: driver-level keepalive, prevents idle connections from being dropped;
+* heartbeat: driver-level keepalive, prevents idle connections from being dropped. 
 `advanced.heartbeat` in the configuration.
-
-'''
 
 == Basics
 
 The driver communicates with Cassandra over TCP, using the Cassandra binary protocol.
 This protocol is asynchronous, which allows each TCP connection to handle multiple simultaneous requests:
 
-* when a query gets executed, a _stream id_ gets assigned to it.
-It is a unique identifier on the current connection;
+* when a query gets executed, a *stream id* gets assigned to it.
+It is a unique identifier on the current connection.
 * the driver writes a request containing the stream id and the query on the connection, and then proceeds without waiting for the response (if you're using the asynchronous API, this is when the driver will send you back a `java.util.concurrent.CompletionStage`).
 Once the request has been written to the connection, we say that it is _in flight_;
 * at some point, Cassandra will send back a response on the connection.
@@ -27,7 +25,7 @@ This response also contains the stream id, which allows the driver to trigger a 
 You don't need to manage connections yourself.
 You simply interact with a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/CqlSession.html[CqlSession] object, which takes care of it.
 
-*For a given session, there is one connection pool per connected node* (a node is connected when it is up and not ignored by the link:../load_balancing/[load balancing policy]).
+*For a given session, there is one connection pool per connected node* (a node is connected when it is up and not ignored by the xref:core:load-balance.adoc[load balancing policy]).
 
 The number of connections per pool is configurable (this will be described in the next section).
 There are up to 32768 stream ids per connection.
@@ -41,9 +39,10 @@ There are up to 32768 stream ids per connection.
 
 == Configuration
 
-Pool sizes are defined in the `connection` section of the link:../configuration/[configuration].
+Pool sizes are defined in the `connection` section of the xref:core:configuration.adoc[configuration].
 Here are the relevant options with their default values:
 
+[source,hocon]
 ----
 datastax-java-driver.advanced.connection {
   max-requests-per-connection = 1024
@@ -63,8 +62,7 @@ However you can adjust the options at runtime, the driver will detect and apply 
 === Heartbeat
 
 If connections stay idle for too long, they might be dropped by intermediate network devices (routers, firewalls...).
-Normally, TCP keepalive should take care of this;
-but tweaking low-level keepalive settings might be impractical in some environments.
+Normally, TCP keepalive should take care of this, but tweaking low-level keepalive settings might be impractical in some environments.
 
 The driver provides application-side keepalive in the form of a connection heartbeat: when a connection does not receive incoming reads for a given amount of time, the driver will simulate activity by writing a dummy request to it.
 If that request fails, the connection is trashed and replaced.
@@ -72,6 +70,7 @@ If that request fails, the connection is trashed and replaced.
 This feature is enabled by default.
 Here are the default values in the configuration:
 
+[source,hocon]
 ----
 datastax-java-driver.advanced.heartbeat {
   interval = 30 seconds
@@ -86,8 +85,9 @@ Both options can be changed at runtime, the new value will be used for new conne
 
 == Monitoring
 
-The driver exposes node-level link:../metrics/[metrics] to monitor your pools (note that all metrics are disabled by default, you'll need to change your configuration to enable them):
+The driver exposes node-level xref:core:metrics.adoc[metrics] to monitor your pools (note that all metrics are disabled by default, you'll need to change your configuration to enable them):
 
+[source,hocon]
 ----
 datastax-java-driver {
   advanced.metrics.node.enabled = [
@@ -126,6 +126,7 @@ In particular, it's a good idea to keep an eye on those two metrics:
 * `pool.available-streams`: if this is often close to 0, it's a sign that the pool is getting saturated.
 Consider adding more connections per node.
 
+[[tuning]]
 == Tuning
 
 The driver defaults should be good for most scenarios.
@@ -135,7 +136,7 @@ The driver defaults should be good for most scenarios.
 In our experience, raising `max-requests-per-connection` above 1024 does not bring any significant improvement: the server is only going to service so many requests at a time anyway, so additional requests are just going to pile up.
 
 Lowering the value is not a good idea either.
-If your goal is to limit the global throughput of the driver, a link:../throttling[throttler] is a better solution.
+If your goal is to limit the global throughput of the driver, a xref:core:throttle.adoc[throttler] is a better solution.
 
 === Number of connections per node
 

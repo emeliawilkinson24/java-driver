@@ -113,7 +113,7 @@ This separate driver module contains the actual bindings for MicroProfile, and d
 Other metrics libraries can also be used.
 However, you will need to provide a custom metrics factory.
 Simply implement the `com.datastax.oss.driver.internal.core.metrics.MetricsFactory` interface for your library of choice, then pass the fully-qualified name of that implementation class to the driver using the `advanced.metrics.factory.class` option.
-See the link:../configuration/reference/[reference configuration].
+See the https://github.com/datastax/java-driver/blob/4.x/manual/core/configuration/reference[reference configuration].
 
 You will certainly need to add the metrics library as a dependency to your application as well.
 It is also recommended excluding Dropwizard and HdrHistogram, as shown above.
@@ -129,7 +129,7 @@ For example, `connected-nodes` measures the number of nodes to which we have con
 * node-level: the data is specific to a node (and therefore there is one metric instance per node).
 For example, `pool.open-connections` measures the number of connections open to this particular node.
 
-To find out which metrics are available, see the link:../configuration/reference/[reference configuration].
+To find out which metrics are available, see the https://github.com/datastax/java-driver/blob/4.x/manual/core/configuration/reference[reference configuration].
 It contains a commented-out line for each metric, with detailed explanations on its intended usage.
 
 By default, all metrics are disabled.
@@ -145,7 +145,7 @@ datastax-java-driver.advanced.metrics {
 If you specify a metric that doesn't exist, it will be ignored, and a warning will be logged.
 
 Finally, if you are using Dropwizard or Micrometer and enabled any metric of timer type, such as `cql-requests`, it is also possible to provide additional configuration to fine-tune the underlying histogram's characteristics and precision, such as its highest expected latency, its number of significant digits to use, and its refresh interval.
-Again, see the link:../configuration/reference/[reference configuration] for more details.
+Again, see the https://github.com/datastax/java-driver/blob/4.x/manual/core/configuration/reference[reference configuration] for more details.
 
 == Selecting a metric identifier style
 

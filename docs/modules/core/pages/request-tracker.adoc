@@ -15,7 +15,7 @@ The driver comes with an optional implementation that logs requests.
 
 == Configuration
 
-Request trackers can be declared in the link:../configuration/[configuration] as follows:
+Request trackers can be declared in the xref:core:configuration.adoc[configuration] as follows:
 
 ----
 datastax-java-driver.advanced.request-tracker {

@@ -209,7 +209,7 @@ More sophisticated operators are capable of rate-limiting or throttling the exec
 for example, Reactor offers a `delayElements` operator that rate-limits the throughput of its upstream publisher.
 Consult the documentation of your reactive library for more information.
 
-As a last resort, it is also possible to limit concurrency at driver level, for example using the driver's built-in link:../throttling/[request throttling] mechanism, although this is usually not required in reactive applications.
+As a last resort, it is also possible to limit concurrency at driver level, for example using the driver's built-in xref:core:throttle.adoc/[request throttling] mechanism, although this is usually not required in reactive applications.
 See "https://docs.datastax.com/en/devapp/doc/devapp/driverManagingConcurrency.html][Managing concurrency in asynchronous query execution]" in the Developer Guide for a few examples.
 
 === Caching query results

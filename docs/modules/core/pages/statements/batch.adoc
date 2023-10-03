@@ -8,8 +8,6 @@ Group a set of statements into an atomic operation.
 * built-in implementation is *immutable*.
 Setters always return a new object, don't ignore the result.
 
-'''
-
 Use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/BatchStatement.html[`BatchStatement`] to execute a set of queries as an atomic operation (refer to  http://docs.datastax.com/en/dse/6.7/cql/cql/cql_using/useBatch.html[Batching inserts, updates and deletes] to understand how to use batching effectively):
 
 [source,java]

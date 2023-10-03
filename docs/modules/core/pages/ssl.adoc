@@ -69,7 +69,7 @@ Then the nodes' truststores only need to contain the CA's certificate (which sho
 
 By default, the driver's SSL support is based on the JDK's built-in implementation: JSSE (Java Secure Socket Extension),.
 
-To enable it, you need to define an engine factory in the link:../configuration/[configuration].
+To enable it, you need to define an engine factory in the xref:core:configuration.adoc[configuration].
 
 === JSSE, property-based
 

@@ -10,8 +10,6 @@ https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/
 * filtering: `advanced.metadata.schema.refreshed-keyspaces` in the configuration.
 * schema agreement: wait for the schema to replicate to all nodes (may add latency to DDL statements).
 
-'''
-
 https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/Metadata.html#getKeyspaces--[Metadata#getKeyspaces] returns a client-side representation of the database schema:
 
 [source,java]
@@ -218,6 +216,7 @@ If you use any other rule, it has to fetch all system rows and filter on the cli
 
 Note that, if you change the list at runtime, `onKeyspaceAdded`/`onKeyspaceDropped` will be invoked on your schema listeners for the newly included/excluded keyspaces.
 
+[[schema-agreement]]
 === Schema agreement
 
 Due to the distributed nature of Cassandra, schema changes made on one node might not be immediately visible to others.

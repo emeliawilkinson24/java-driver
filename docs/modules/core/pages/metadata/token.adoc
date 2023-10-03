@@ -8,8 +8,6 @@ https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/
 * immutable (must invoke again to observe changes).
 * `advanced.metadata.token-map.enabled` in the configuration (defaults to true).
 
-'''
-
 https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/Metadata.html#getTokenMap--[Metadata#getTokenMap] returns information about the tokens used for data replication.
 It is used internally by the driver to send requests to the optimal coordinator when token-aware routing is enabled.
 Another typical use case is data analytics clients, for example fetching a large range of keys in parallel by sending sub-queries to each replica.

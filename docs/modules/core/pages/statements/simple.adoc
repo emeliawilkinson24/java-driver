@@ -10,8 +10,6 @@ Driver has to guess target CQL types, this can lead to ambiguities.
 * built-in implementation is *immutable*.
 Setters always return a new object, don't ignore the result.
 
-'''
-
 Use https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/SimpleStatement.html[`SimpleStatement`] for queries that will be executed only once (or just a few times):
 
 [source,java]

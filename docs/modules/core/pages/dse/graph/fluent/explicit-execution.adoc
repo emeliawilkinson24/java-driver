@@ -101,6 +101,4 @@ Traversal batches are only available with DSE 6.0 or above.
 
 At the time of writing (DSE 6.0), prepared graph statements are not supported yet.
 
-'''
-
 See also the xref:dse:graph/fluent/fluent-api.adoc[Fluent API] for topics common to all fluent traversals.

@@ -46,6 +46,4 @@ GraphTraversalSource a = AnonymousTraversalSource.traversal().withRemote(
         .build());
 ----
 
-'''
-
 See xref:core:dse/graph/fluent/fluent-api.adoc[Fluent API] for topics common to all fluent traversals.

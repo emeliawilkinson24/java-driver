@@ -16,7 +16,7 @@ the _load balancing policy_ (sometimes abbreviated LBP) is a central component t
 * which nodes the driver will communicate with;
 * for each new query, which coordinator to pick, and which nodes to use as failover.
 
-It is defined in the link:../configuration/[configuration]:
+It is defined in the xref:core:configuration.adoc[configuration]:
 
 ----
 datastax-java-driver.basic.load-balancing-policy {
@@ -31,7 +31,7 @@ datastax-java-driver.basic.load-balancing-policy {
 For each node, the policy computes a _distance_ that determines how connections will be established:
 
 * `LOCAL` and `REMOTE` are "active" distances, meaning that the driver will keep open connections to this node.
-link:../pooling/[Connection pools] can be sized independently for each distance.
+xref:core:connection-pool.adoc[Connection pools] can be sized independently for each distance.
 * `IGNORED` means that the driver will never attempt to connect.
 
 Typically, the distance will reflect network topology (e.g.
@@ -195,7 +195,7 @@ Setting this option to any value greater than zero will have the following effec
 
 * The load balancing policies will assign the `REMOTE` distance to that many nodes _in each remote datacenter_.
 * The driver will then attempt to open connections to those nodes.
-The actual number of connections to open to each one of those nodes is configurable, see link:../pooling/[Connection pools] for more details.
+The actual number of connections to open to each one of those nodes is configurable, see xref:core:connection-pool.adoc[Connection pools] for more details.
 By default, the driver opens only one connection to each node.
 * Those remote nodes (and only those) will then become eligible for inclusion in query plans, effectively enabling cross-datacenter failover.
 
@@ -235,7 +235,7 @@ The default policy is *token-aware* by default: requests will be routed in prior
 
 ==== Providing routing information
 
-First make sure that link:../metadata/token/#configuration[token metadata] is enabled.
+First make sure that xref:core:metadata/metadata.adoctoken/#configuration[token metadata] is enabled.
 
 Then your statements need to provide:
 
@@ -353,7 +353,7 @@ Feel free to extend `BasicLoadingBalancingPolicy` and override only the methods 
 
 == Using multiple policies
 
-The load balancing policy can be overridden in link:../configuration/#profiles[execution profiles]:
+The load balancing policy can be overridden in xref:core:configuration.adoc#profiles[execution profiles]:
 
 ----
 datastax-java-driver {

@@ -60,7 +60,7 @@ There are various ways to get it:
   TupleType tupleType = (TupleType) ps.getVariableDefinitions().get("v").getType();
 ----
 
-* from the driver's link:../metadata/schema/[schema metadata]:
+* from the driver's xref:core:metadata/schema.adoc[schema metadata]:
 +
 [source,java]
 ----

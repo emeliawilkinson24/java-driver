@@ -35,7 +35,7 @@ for example, it may downgrade LOCAL_QUORUM to ONE, and thus could accidentally  
 In summary: *only  use this retry policy if you understand the consequences.*
 
 Since `DefaultRetryPolicy` is already the driver's default retry policy, no special configuration is required to activate it.
-To use `ConsistencyDowngradingRetryPolicy` instead, the following  option must be declared in the driver link:../configuration/[configuration]:
+To use `ConsistencyDowngradingRetryPolicy` instead, the following  option must be declared in the driver xref:core:configuration.adoc[configuration]:
 
 ----
 datastax-java-driver.advanced.retry-policy.class = ConsistencyDowngradingRetryPolicy
@@ -53,7 +53,7 @@ A retry verdict essentially provides the driver with a https://docs.datastax.com
 There are four possible retry decisions:
 
 * retry on the same node;
-* retry on the next node in the link:../load_balancing/[query plan] for this statement;
+* retry on the next node in the xref:core:load-balance.adoc[query plan] for this statement;
 * rethrow the exception to the user code (from the `session.execute` call, or as a failed future if using the asynchronous API);
 * ignore the exception.
 That is, mark the request as successful, and return an empty result set.
@@ -128,7 +128,7 @@ The request was aborted before we could get a response from the coordinator.
 This can happen in two cases:
 
 * if the connection was closed due to an external event.
-This will manifest as a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/connection/ClosedConnectionException.html[ClosedConnectionException] (network failure) or https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/connection/HeartbeatException.html[HeartbeatException] (missed link:../pooling/#heartbeat[heartbeat]);
+This will manifest as a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/connection/ClosedConnectionException.html[ClosedConnectionException] (network failure) or https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/connection/HeartbeatException.html[HeartbeatException] (missed xref:core:connection-pool.adoc#heartbeat[heartbeat]);
 * if there was an unexpected error while decoding the response (this can only be a driver bug).
 
 This method is only invoked for link:../idempotence/[idempotent] statements.
@@ -151,7 +151,7 @@ Both the default policy and `ConsistencyDowngradingRetryPolicy` rethrow read and
 There are a few cases where retrying is always the right thing to do.
 These are not covered by `RetryPolicy`, but instead hard-coded in the driver:
 
-* *any error before a network write was attempted*: to send a query, the driver selects a node, borrows a connection from the host's link:../pooling/[connection pool], and then writes the message to the connection.
+* *any error before a network write was attempted*: to send a query, the driver selects a node, borrows a connection from the host's xref:core:connection-pool.adoc[connection pool], and then writes the message to the connection.
 Errors can occur before the write was even attempted, for example if the connection pool is saturated, or if the node went down right after we borrowed.
 In those cases, it is always safe to retry since the request wasn't sent, so the driver will transparently move to the next node in the query plan.
 * *re-preparing a statement*: when the driver executes a prepared statement, it may find out that the coordinator doesn't know about it, and need to re-prepare it on the fly (this is described in detail link:../statements/prepared/[here]).
@@ -169,7 +169,7 @@ These include:
 
 == Using multiple policies
 
-The retry policy can be overridden in link:../configuration/#profiles[execution profiles]:
+The retry policy can be overridden in xref:core:configuration.adoc#profiles[execution profiles]:
 
 ----
 datastax-java-driver {

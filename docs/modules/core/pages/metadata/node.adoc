@@ -7,8 +7,6 @@ https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/
 * https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/Node.html[Node] instances are mutable, the fields will update in real time.
 * getting notifications: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#addNodeStateListener-com.datastax.oss.driver.api.core.metadata.NodeStateListener-[CqlSession.builder().addNodeStateListener].
 
-'''
-
 https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/metadata/Metadata.html#getNodes--[Metadata#getNodes] returns all the nodes known to the driver when the metadata was retrieved including down and ignored nodes (see below).
 The fact that a node is in this list does not necessarily mean that the driver is connected to it.
 

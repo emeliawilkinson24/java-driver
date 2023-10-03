@@ -107,7 +107,7 @@ We declare the dependencies, and tell Maven that we're going to use Java 8:
 
 ==== Application configuration
 
-`application.conf` is not stricly necessary, but it illustrates an important point about the driver's link:../configuration/[configuration]: you override any of the driver's default options here.
+`application.conf` is not stricly necessary, but it illustrates an important point about the driver's xref:core:configuration.adoc[configuration]: you override any of the driver's default options here.
 
 ----
 datastax-java-driver {
@@ -289,9 +289,9 @@ this is useful to avoid dependency hell if you already use Netty in another part
 
 === Typesafe config
 
-https://lightbend.github.io/config/[Typesafe config] is used for our file-based link:../configuration/[configuration].
+https://lightbend.github.io/config/[Typesafe config] is used for our file-based xref:core:configuration.adoc[configuration].
 
-It is a required dependency if you use the driver's built-in configuration loader, but this can be link:../configuration/#bypassing-typesafe-config[completely overridden] with your own implementation, that could use a different framework or an ad-hoc solution.
+It is a required dependency if you use the driver's built-in configuration loader, but this can be xref:core:configuration.adoc#bypassing-typesafe-config[completely overridden] with your own implementation, that could use a different framework or an ad-hoc solution.
 
 In that case, you can exclude the dependency:
 
@@ -348,7 +348,7 @@ See the link:../compression/[Compression] page for more details.
 
 === Metrics
 
-The driver exposes link:../metrics/[metrics] through the http://metrics.dropwizard.io/4.1.2/[Dropwizard] library.
+The driver exposes xref:core:metrics.adoc[metrics] through the http://metrics.dropwizard.io/4.1.2/[Dropwizard] library.
 
 The dependency is declared as required, but metrics are optional.
 If you've disabled all metrics, or if you are using a different metrics library, and you never call https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/Session.html#getMetrics--[Session.getMetrics] anywhere in your application, then you can remove the dependency:
@@ -370,7 +370,7 @@ If you've disabled all metrics, or if you are using a different metrics library,
 
 In addition, when using Dropwizard, "timer" metrics use http://hdrhistogram.github.io/HdrHistogram/[HdrHistogram] to record latency percentiles.
 At the time of writing, these metrics are: `cql-requests`, `throttling.delay` and `cql-messages`;
-you can also identify them by reading the comments in the link:../configuration/reference/[configuration reference] (look for "exposed as a Timer").
+you can also identify them by reading the comments in the https://github.com/datastax/java-driver/blob/4.x/manual/core/configuration/reference[configuration reference] (look for "exposed as a Timer").
 
 If all of these metrics are disabled, or if you use a different metrics library, you can remove the dependency:
 

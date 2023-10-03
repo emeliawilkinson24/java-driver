@@ -7,8 +7,6 @@
 Also available: plain-text credentials, GSSAPI (DSE only), or write your own.
 * can also be defined programmatically: https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#withAuthCredentials-java.lang.String-java.lang.String-[`CqlSession.builder().withAuthCredentials`] or https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/SessionBuilder.html#withAuthProvider-com.datastax.oss.driver.api.core.auth.AuthProvider-[`CqlSession.builder().withAuthProvider`].
 
-'''
-
 Cassandra's binary protocol supports https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer[SASL]-based authentication.
 To use it, you must provide an _auth provider_ that will authenticate with the server every time a new connection gets established.
 

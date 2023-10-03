@@ -12,8 +12,6 @@ It only needs to contain the options that you override.
  ** hot reloading is supported out of the box.
 * the config mechanism can be completely overridden by implementing a set of driver interfaces (https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/config/DriverConfig.html[DriverConfig], https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/config/DriverExecutionProfile.html[DriverExecutionProfile] and https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/config/DriverConfigLoader.html[DriverConfigLoader])
 
-'''
-
 == Concepts
 
 === Options

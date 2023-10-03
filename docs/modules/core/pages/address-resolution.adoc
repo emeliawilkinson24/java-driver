@@ -9,8 +9,6 @@ For special network topologies, an address translation component can be plugged 
 * none by default.
 Also available: EC2-specific (for deployments that span multiple regions), or write your own.
 
-'''
-
 Each node in the Cassandra cluster is uniquely identified by an IP address that the driver will use to establish connections.
 
 * for contact points, these are provided as part of configuring the `CqlSession` object;
@@ -81,7 +79,7 @@ public class MyAddressTranslator implements AddressTranslator {
 }
 ----
 
-Then reference this class from the link:../configuration/[configuration]:
+Then reference this class from the xref:core:configuration.adoc[configuration]:
 
 [source,hocon]
 ----

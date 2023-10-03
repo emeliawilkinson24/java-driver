@@ -70,7 +70,7 @@ ProtocolVersion currentVersion = session.getContext().getProtocolVersion();
 ----
 
 The protocol version cannot be changed at runtime.
-However, you can force a particular version in the link:../configuration/[configuration]:
+However, you can force a particular version in the xref:core:configuration.adoc[configuration]:
 
 ----
 datastax-java-driver {

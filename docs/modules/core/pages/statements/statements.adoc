@@ -8,8 +8,6 @@ What you pass to `session.execute()`:
 * built-in implementations are *immutable*.
 Setters always return a new object, don't ignore the result.
 
-'''
-
 To execute a CQL query, you  create a https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/cql/Statement.html[Statement] instance and pass it to https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/Session.html#execute-com.datastax.oss.driver.api.core.cql.Statement-[Session#execute] or https://docs.datastax.com/en/drivers/java/4.17/com/datastax/oss/driver/api/core/session/Session.html#executeAsync-com.datastax.oss.driver.api.core.cql.Statement-[Session#executeAsync].
 The driver provides various implementations:
 
